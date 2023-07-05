@@ -3,7 +3,6 @@ import { database } from '@/database';
 import { logger } from '@/logger';
 import {
   allowedUserMiddleware,
-  chatMiddleware,
   stateMiddleware,
   userMiddleware,
 } from '@/middlewares';
@@ -15,7 +14,6 @@ const bot = new Bot<BotContext>(config.botToken);
 bot.catch(logger.error);
 bot.use(stateMiddleware);
 bot.use(userMiddleware);
-bot.use(chatMiddleware);
 bot.use(allowedUserMiddleware);
 
 bot.command('start', async (context) => {
