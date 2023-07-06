@@ -1,10 +1,14 @@
-import { valueOrDefault } from '@/values';
+import { valueOrDefault, valueOrThrow } from '@/values';
 
 /* eslint-disable node/no-process-env */
 export const config = {
   adminsUsernames: valueOrDefault(process.env.ADMINS_USERNAMES?.split(','), []),
   botToken: valueOrDefault(process.env.BOT_TOKEN, ''),
   env: valueOrDefault(process.env.ENV, 'development'),
+  openAiApiKey: valueOrThrow(
+    process.env.OPENAI_API_KEY,
+    'OPENAI_API_KEY is not set',
+  ),
 };
 /* eslint-enable node/no-process-env */
 
