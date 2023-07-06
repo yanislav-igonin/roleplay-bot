@@ -30,7 +30,7 @@ bot.on('message:text', async (context) => {
 
   try {
     const message = `Echo: ${text}`;
-    await context.reply(message, { reply_to_message_id: replyToMessageId });
+    // await context.reply(message, { reply_to_message_id: replyToMessageId });
   } catch (error) {
     await context.reply(replies.error);
     throw error;

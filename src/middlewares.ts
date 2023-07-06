@@ -1,4 +1,5 @@
-import { user as userRepo } from '@/repositories';
+import { config } from './config';
+import { userModel } from './database';
 import { valueOrNull } from '@/values';
 import { type BotContext } from 'context';
 import { type NextFunction } from 'grammy';
@@ -27,7 +28,9 @@ export const userMiddleware = async (
 
   const { id: userId } = user;
 
-  const databaseUser = await userRepo.get(userId.toString());
+  const databaseUser = await userModel.findUnique({
+    where: { id: userId.toString() },
+  });
   if (databaseUser) {
     // eslint-disable-next-line require-atomic-updates
     context.state.user = databaseUser;
@@ -51,7 +54,7 @@ export const userMiddleware = async (
     username: valueOrNull(username),
   };
 
-  const newUser = await userRepo.create(toCreate);
+  const newUser = await userModel.create({ data: toCreate });
   // eslint-disable-next-line require-atomic-updates
   context.state.user = newUser;
 
@@ -64,12 +67,12 @@ export const allowedUserMiddleware = async (
   next: NextFunction,
 ) => {
   const { isAllowed, username } = context.state.user;
-  const isAdmin = userRepo.checkIsAdmin(username ?? '');
+  const isAdmin = config.adminsUsernames.includes(username ?? '');
 
   const hasAccess = isAllowed || isAdmin;
 
   if (!hasAccess) {
-    await context.reply('Access denied');
+    // await context.reply('Access denied');
     return;
   }
 
