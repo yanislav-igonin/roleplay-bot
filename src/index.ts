@@ -7,17 +7,28 @@ import {
   userMiddleware,
 } from '@/middlewares';
 import { replies } from '@/replies';
+import { Menu } from '@grammyjs/menu';
 import { type BotContext } from 'context';
 import { Bot } from 'grammy';
+import { locale } from 'locale';
+
+const menus = {
+  // @ts-expect-error qsdfsdf
+  start: new Menu('movements').text(
+    locale.ru.newGame,
+    async (context: BotContext) => await context.reply('Forward!'),
+  ),
+};
 
 const bot = new Bot<BotContext>(config.botToken);
 bot.catch(logger.error);
 bot.use(stateMiddleware);
 bot.use(userMiddleware);
 bot.use(allowedUserMiddleware);
+bot.use(menus.start);
 
 bot.command('start', async (context) => {
-  await context.reply(replies.start);
+  await context.reply(replies.start, { reply_markup: menus.start });
 });
 
 bot.command('help', async (context) => {
