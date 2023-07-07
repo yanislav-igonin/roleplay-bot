@@ -36,6 +36,7 @@
     "typescript": "^5.0.2"
   },
   "dependencies": {
+    "@grammyjs/menu": "^1.2.1",
     "@prisma/client": "^4.11.0",
     "grammy": "^1.15.3",
     "openai": "^3.3.0"
