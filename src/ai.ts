@@ -57,7 +57,7 @@ const newGameDescriptionPrompt =
 
 const newGameNamePrompt =
   `You're a game master. ` +
-  `You're in charge of a game that is similar to Dungeon and Dragons ` +
+  `You're in charge of a game that is similar to Dungeon and Dragons. ` +
   `Make a short name for a new game based on the description provided between """ below:\n\n`;
 
 /**
@@ -85,7 +85,7 @@ export const getNewGameDescription = async () => {
  * @param description Game description.
  */
 export const getNewGameName = async (description: string) => {
-  const propmpt = newGameNamePrompt + `"""description"""`;
+  const propmpt = newGameNamePrompt + `"""${description}"""`;
   const message = addSystemContext(propmpt);
   const response = await openai.createChatCompletion({
     messages: [message],
