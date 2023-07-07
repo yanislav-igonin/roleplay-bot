@@ -1,8 +1,9 @@
 -- CreateTable
 CREATE TABLE "games" (
     "id" SERIAL NOT NULL,
-    "name" TEXT,
-    "description" TEXT,
+    "name" TEXT NOT NULL,
+    "description" TEXT NOT NULL,
+    "createdByUserId" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "games_pkey" PRIMARY KEY ("id")
@@ -30,6 +31,9 @@ CREATE TABLE "inventories" (
 
     CONSTRAINT "inventories_pkey" PRIMARY KEY ("id")
 );
+
+-- AddForeignKey
+ALTER TABLE "games" ADD CONSTRAINT "games_createdByUserId_fkey" FOREIGN KEY ("createdByUserId") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "contexts" ADD CONSTRAINT "contexts_gameId_fkey" FOREIGN KEY ("gameId") REFERENCES "games"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
