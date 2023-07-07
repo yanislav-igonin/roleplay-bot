@@ -11,16 +11,16 @@ datasource db {
 }
 
 model User {
-  id          String      @id
-  username    String?     @unique
-  firstName   String?
-  lastName    String?
-  language    String?
-  isAllowed   Boolean     @default(false)
-  createdAt   DateTime    @default(now())
-  contexts    Context[]
-  inventories Inventory[]
-  Game        Game[]
+  id         String      @id
+  username   String?     @unique
+  firstName  String?
+  lastName   String?
+  language   String?
+  isAllowed  Boolean     @default(false)
+  createdAt  DateTime    @default(now())
+  contexts   Context[]
+  games      Game[]
+  characters Character[]
 
   @@map("users")
 }
@@ -33,7 +33,7 @@ model Game {
   createdByUser   User        @relation(fields: [createdByUserId], references: [id])
   createdAt       DateTime    @default(now())
   contexts        Context[]
-  inventories     Inventory[]
+  characters       Character[]
 
   @@map("games")
 }
@@ -49,16 +49,28 @@ model Context {
   @@map("contexts")
 }
 
-model Inventory {
-  id          Int      @id @default(autoincrement())
+model Item {
+  id          Int       @id @default(autoincrement())
   name        String
   description String?
   quantity    Int
-  gameId      Int
-  game        Game     @relation(fields: [gameId], references: [id])
-  userId      String
-  user        User     @relation(fields: [userId], references: [id])
-  createdAt   DateTime @default(now())
+  characterId Int
+  character   Character @relation(fields: [characterId], references: [id])
+  createdAt   DateTime  @default(now())
 
-  @@map("inventories")
+  @@map("items")
+}
+
+model Character {
+  id          Int         @id @default(autoincrement())
+  name        String
+  description String
+  gameId      Int
+  game        Game        @relation(fields: [gameId], references: [id])
+  userId      String
+  user        User        @relation(fields: [userId], references: [id])
+  createdAt   DateTime    @default(now())
+  items   Item[]
+
+  @@map("characters")
 }

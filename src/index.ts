@@ -15,7 +15,7 @@ import { locale } from 'locale';
 
 const menus = {
   // @ts-expect-error Argument of type is not assignable to parameter of type
-  start: new Menu('movements').text(locale.ru.buttons.newGame, startNewGame),
+  start: new Menu('start').text(locale.ru.buttons.newGame, startNewGame),
 };
 
 const bot = new Bot<BotContext>(config.botToken);
