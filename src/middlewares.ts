@@ -1,5 +1,6 @@
 import { config } from './config';
 import { userModel } from './database';
+import { logger } from './logger';
 import { valueOrNull } from '@/values';
 import { type BotContext } from 'context';
 import { type NextFunction } from 'grammy';
@@ -13,6 +14,19 @@ export const stateMiddleware = async (
   context.state = {};
   // eslint-disable-next-line node/callback-return
   await next();
+};
+
+export const errorMiddleware = async (
+  context: BotContext,
+  next: NextFunction,
+) => {
+  try {
+    // eslint-disable-next-line node/callback-return
+    await next();
+  } catch (error) {
+    logger.error(error);
+    await context.reply((error as Error).message);
+  }
 };
 
 export const userMiddleware = async (

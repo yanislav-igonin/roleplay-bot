@@ -3,6 +3,7 @@ import { database } from '@/database';
 import { logger } from '@/logger';
 import {
   allowedUserMiddleware,
+  errorMiddleware,
   stateMiddleware,
   userMiddleware,
 } from '@/middlewares';
@@ -13,13 +14,14 @@ import { Bot } from 'grammy';
 import { locale } from 'locale';
 
 const menus = {
-  // @ts-expect-error Argument of type is not assignable to parameter of type 
+  // @ts-expect-error Argument of type is not assignable to parameter of type
   start: new Menu('movements').text(locale.ru.buttons.newGame, startNewGame),
 };
 
 const bot = new Bot<BotContext>(config.botToken);
 bot.catch(logger.error);
 bot.use(stateMiddleware);
+bot.use(errorMiddleware);
 bot.use(userMiddleware);
 bot.use(allowedUserMiddleware);
 bot.use(menus.start);

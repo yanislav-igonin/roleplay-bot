@@ -1,4 +1,5 @@
 import { config } from '@/config';
+import { Language } from 'locale';
 import { type ChatCompletionRequestMessage } from 'openai';
 import { Configuration, OpenAIApi } from 'openai';
 
@@ -42,28 +43,33 @@ const gameMasterPromt =
   `You're in charge of a game that is similar to Dungeon and Dragons ` +
   `roleplay game but with a simplier rules.`;
 
-const newGameDescriptionPrompt =
+const markdownRules =
+  `Text should be formatted in Markdown.` +
+  `You can use ONLY the following formatting without any exceptions:` +
+  `**bold text**, *italic text*, ~~strikethrough~~`;
+
+const getNewGameDescriptionPrompt = (language: Language) =>
   `You're a game master. ` +
   `You're in charge of a game that is similar to Dungeon and Dragons ` +
   `roleplay game but with a simplier rules. ` +
-  `Your task is to make a quest for a new game.` +
+  `Your task is to make a quest for a new game in ${language} language.` +
   `You can use any fantasy setting you want. ` +
   `Describe a world briefly, its inhabitants and where the heroes located. ` +
   `Describe a quest that players will have to complete. ` +
   `All description should not be longer than 1000 characters. ` +
-  `Translate everything into Russian. `;
+  markdownRules;
 
-const newGameNamePrompt =
+const getNewGameNamePrompt = (language: Language) =>
   `You're a game master. ` +
   `You're in charge of a game that is similar to Dungeon and Dragons. ` +
-  `Make a short name in Russian for a new game based on the description ` +
+  `Make a short name in ${language} for a new game based on the description ` +
   `provided between """ below:\n\n`;
 
 /**
  * Make a new game description.
  */
 export const getNewGameDescription = async () => {
-  const message = addSystemContext(newGameDescriptionPrompt);
+  const message = addSystemContext(getNewGameDescriptionPrompt(Language.Ru));
   const response = await openai.createChatCompletion({
     messages: [message],
     model: 'gpt-4',
@@ -84,7 +90,7 @@ export const getNewGameDescription = async () => {
  * @param description Game description.
  */
 export const getNewGameName = async (description: string) => {
-  const propmpt = newGameNamePrompt + `"""${description}"""`;
+  const propmpt = getNewGameNamePrompt(Language.Ru) + `"""${description}"""`;
   const message = addSystemContext(propmpt);
   const response = await openai.createChatCompletion({
     messages: [message],

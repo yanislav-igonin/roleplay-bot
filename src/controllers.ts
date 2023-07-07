@@ -12,7 +12,7 @@ export const startNewGame = async (context: BotContext) => {
   await gameModel.create({
     data: { createdByUserId: user.id, description, name },
   });
-  await context.reply(`**${name}**\n\n${description}`, {
-    parse_mode: 'MarkdownV2',
+  await context.reply(`*${name}*\n\n${description}`, {
+    parse_mode: 'Markdown',
   });
 };

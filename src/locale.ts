@@ -1,6 +1,9 @@
 enum Locales {
   Ru = 'ru',
 }
+export enum Language {
+  Ru = 'Russian',
+}
 type Locale = {
   buttons: {
     newGame: string;
