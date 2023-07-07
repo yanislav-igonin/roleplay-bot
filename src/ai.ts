@@ -161,7 +161,7 @@ export const getImage = async (text: string) => {
   const response = await openai.createImage({
     prompt: text,
     response_format: 'url',
-    size: '1024x1024',
+    size: '512x512',
   });
   const { url } = response.data.data[0];
   if (!url) {
