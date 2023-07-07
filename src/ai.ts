@@ -65,6 +65,31 @@ const getNewGameNamePrompt = (language: Language) =>
   `Make a short name in ${language} for a new game based on the description ` +
   `provided between """ below:\n\n`;
 
+type GetNewCharacterPromptData = {
+  gameDescription: string;
+  language: Language;
+};
+const getNewCharacterPrompt = ({
+  language,
+  gameDescription,
+}: GetNewCharacterPromptData) =>
+  `You're a game master. ` +
+  `You're in charge of a game that is similar to Dungeon and Dragons. ` +
+  `Make a new character for the game (game description provided below between` +
+  `""") in ${language} language. ` +
+  `Output must be in json format like ` +
+  `{name: "Character name",Q description: "Character description"}. ` +
+  `Character description should not be longer than 500 characters. ` +
+  `Character descrpition ` +
+  markdownRules +
+  ` ` +
+  `Describe a character's appearance, race (based on any provided in the game` +
+  `description, or invent your own, but it should fit in the game world),` +
+  `personality, background, etc. ` +
+  `Character can have some items, skills, spells, etc.\n\n` +
+  `Game description:\n` +
+  `"""${gameDescription}"""\n\n`;
+
 /**
  * Make a new game description.
  */
@@ -82,6 +107,28 @@ export const getNewGameDescription = async () => {
   }
 
   return text;
+};
+
+export const getNewCharacter = async ({
+  gameDescription,
+}: {
+  gameDescription: string;
+}) => {
+  const message = addSystemContext(
+    getNewCharacterPrompt({ gameDescription, language: Language.Ru }),
+  );
+  const response = await openai.createChatCompletion({
+    messages: [message],
+    model: 'gpt-4',
+    temperature: 0.7,
+  });
+
+  const text = response.data.choices[0].message?.content;
+  if (!text) {
+    throw new Error('No text in response');
+  }
+
+  return JSON.parse(text) as { description: string; name: string };
 };
 
 /**
@@ -104,6 +151,24 @@ export const getNewGameName = async (description: string) => {
   }
 
   return text;
+};
+
+/**
+ * Generate an image based on text provided.
+ * Useful to generate any kind of images for games views, characters portraits, etc.
+ */
+export const getImage = async (text: string) => {
+  const response = await openai.createImage({
+    prompt: text,
+    response_format: 'url',
+    size: '1024x1024',
+  });
+  const { url } = response.data.data[0];
+  if (!url) {
+    throw new Error('No url in response');
+  }
+
+  return url;
 };
 
 export const getAiResponse = async (
