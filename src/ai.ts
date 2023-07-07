@@ -43,6 +43,64 @@ const gameMasterPromt =
   `You're in charge of a game that is similar to Dungeon and Dragons ` +
   `roleplay game but with a simplier rules.`;
 
+const newGameDescriptionPrompt =
+  `You're a game master. ` +
+  `You're in charge of a game that is similar to Dungeon and Dragons ` +
+  `roleplay game but with a simplier rules. ` +
+  `Your task is to make a quest for a new game.` +
+  `You can use any fantasy setting you want. ` +
+  `Describe a world and its inhabitants. ` +
+  `Describe a quest that players will have to complete. ` +
+  `Describe a reward for completing the quest. ` +
+  `Describe a punishment for failing the quest. ` +
+  `All description should not be longer than 1000 characters. `;
+
+const newGameNamePrompt =
+  `You're a game master. ` +
+  `You're in charge of a game that is similar to Dungeon and Dragons ` +
+  `Make a short name for a new game based on the description provided between """ below:\n\n`;
+
+/**
+ * Make a new game description.
+ */
+export const getNewGameDescription = async () => {
+  const message = addSystemContext(newGameDescriptionPrompt);
+  const response = await openai.createChatCompletion({
+    messages: [message],
+    model: 'gpt-4',
+    temperature: 0.7,
+  });
+
+  const text = response.data.choices[0].message?.content;
+  if (!text) {
+    throw new Error('No text in response');
+  }
+
+  return text;
+};
+
+/**
+ * Make a new game name based on description.
+ *
+ * @param description Game description.
+ */
+export const getNewGameName = async (description: string) => {
+  const propmpt = newGameNamePrompt + `"""description"""`;
+  const message = addSystemContext(propmpt);
+  const response = await openai.createChatCompletion({
+    messages: [message],
+    model: 'gpt-3.5-turbo',
+    temperature: 0.7,
+  });
+
+  const text = response.data.choices[0].message?.content;
+  if (!text) {
+    throw new Error('No text in response');
+  }
+
+  return text;
+};
+
 export const getAiResponse = async (
   prompt: string,
   context: ChatCompletionRequestMessage[] = [],

@@ -9,15 +9,13 @@ import {
 import { replies } from '@/replies';
 import { Menu } from '@grammyjs/menu';
 import { type BotContext } from 'context';
+import { startNewGame } from 'controllers';
 import { Bot } from 'grammy';
 import { locale } from 'locale';
 
 const menus = {
   // @ts-expect-error qsdfsdf
-  start: new Menu('movements').text(
-    locale.ru.newGame,
-    async (context: BotContext) => await context.reply('Forward!'),
-  ),
+  start: new Menu('movements').text(locale.ru.newGame, startNewGame),
 };
 
 const bot = new Bot<BotContext>(config.botToken);
