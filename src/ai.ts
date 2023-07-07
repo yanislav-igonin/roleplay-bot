@@ -1,4 +1,3 @@
-import { replies } from './replies';
 import { config } from '@/config';
 import { type ChatCompletionRequestMessage } from 'openai';
 import { Configuration, OpenAIApi } from 'openai';
@@ -49,16 +48,16 @@ const newGameDescriptionPrompt =
   `roleplay game but with a simplier rules. ` +
   `Your task is to make a quest for a new game.` +
   `You can use any fantasy setting you want. ` +
-  `Describe a world and its inhabitants. ` +
+  `Describe a world briefly, its inhabitants and where the heroes located. ` +
   `Describe a quest that players will have to complete. ` +
-  `Describe a reward for completing the quest. ` +
-  `Describe a punishment for failing the quest. ` +
-  `All description should not be longer than 1000 characters. `;
+  `All description should not be longer than 1000 characters. ` +
+  `Translate everything into Russian. `;
 
 const newGameNamePrompt =
   `You're a game master. ` +
   `You're in charge of a game that is similar to Dungeon and Dragons. ` +
-  `Make a short name for a new game based on the description provided between """ below:\n\n`;
+  `Make a short name in Russian for a new game based on the description ` +
+  `provided between """ below:\n\n`;
 
 /**
  * Make a new game description.
@@ -112,6 +111,11 @@ export const getAiResponse = async (
     messages,
     model,
   });
+
   const text = response.data.choices[0].message?.content;
-  return text?.trim() ?? replies.error;
+  if (!text) {
+    throw new Error('No text in response');
+  }
+
+  return text;
 };
