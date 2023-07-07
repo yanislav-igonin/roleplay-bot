@@ -11,13 +11,35 @@ datasource db {
 }
 
 model User {
-  id        String   @id
-  username  String?  @unique
+  id        String    @id
+  username  String?   @unique
   firstName String?
   lastName  String?
   language  String?
-  isAllowed Boolean @default(false)
-  createdAt DateTime @default(now())
+  isAllowed Boolean   @default(false)
+  createdAt DateTime  @default(now())
+  context   Context[]
 
   @@map("users")
+}
+
+model Game {
+  id          Int       @id @default(autoincrement())
+  name        String?
+  description String?
+  createdAt   DateTime  @default(now())
+  contexts     Context[]
+
+  @@map("games")
+}
+
+model Context {
+  id        Int      @id @default(autoincrement())
+  gameId    Int
+  game      Game     @relation(fields: [gameId], references: [id])
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+
+  @@map("contexts")
 }
