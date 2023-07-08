@@ -4,7 +4,7 @@ import {
   getNewCharacter,
   getNewGameDescription,
   getNewGameName,
-} from 'ai';
+} from 'ai/ai';
 import { type BotContext } from 'context';
 import { InputMediaBuilder } from 'grammy';
 import { locale } from 'locale';
@@ -27,7 +27,7 @@ export const startNewGame = async (context: BotContext) => {
   const gamePictureUrl = await getImage(gameDescription);
 
   const { name: characterName, description: characterDescription } =
-    await getNewCharacter({ gameDescription });
+    await getNewCharacter(gameDescription);
   const character = await characterModel.create({
     data: {
       description: characterDescription,
