@@ -8,6 +8,10 @@ const configuration = new Configuration({
 });
 export const openai = new OpenAIApi(configuration);
 
+// ====================================================
+// ====================================================
+// ====================================================
+
 export const addSystemContext = (
   text: string,
 ): ChatCompletionRequestMessage => {
@@ -33,6 +37,10 @@ export const addUserContext = (text: string): ChatCompletionRequestMessage => {
   };
 };
 
+// ====================================================
+// ====================================================
+// ====================================================
+
 // const gameRules =
 //   `Each time players try to do something game master` +
 //   `(GM) will roll a d20 dice for this action. ` +
@@ -48,31 +56,22 @@ const markdownRules =
   `You can use ONLY the following formatting without any exceptions:` +
   `**bold text**, *italic text*, ~~strikethrough~~`;
 
-const getNewGameDescriptionPrompt = (language: Language) =>
-  `You're a game master. ` +
-  `You're in charge of a game that is similar to Dungeon and Dragons ` +
-  `roleplay game but with a simplier rules. ` +
-  `Your task is to make a quest for a new game in ${language} language.` +
-  `You can use any fantasy setting you want. ` +
-  `Describe a world briefly, its inhabitants and where the heroes located. ` +
-  `Describe a quest that players will have to complete. ` +
-  `All description should not be longer than 1000 characters. ` +
-  markdownRules;
+// ====================================================
+// ====================================================
+// ====================================================
 
-const getNewGameNamePrompt = (language: Language) =>
-  `You're a game master. ` +
-  `You're in charge of a game that is similar to Dungeon and Dragons. ` +
-  `Make a short name in ${language} for a new game based on the description ` +
-  `provided between """ below:\n\n`;
+// ====================================================
+// ====================================================
+// ====================================================
 
-type GetNewCharacterPromptData = {
+type GetNewCharacterDescriptionPromptData = {
   gameDescription: string;
   language: Language;
 };
-const getNewCharacterPrompt = ({
+const getNewCharacterDescriptionPrompt = ({
   language,
   gameDescription,
-}: GetNewCharacterPromptData) =>
+}: GetNewCharacterDescriptionPromptData) =>
   `You're a game master. ` +
   `You're in charge of a game that is similar to Dungeon and Dragons. ` +
   `Make a new character for the game (game description provided below between` +
@@ -86,10 +85,87 @@ const getNewCharacterPrompt = ({
   `personality, background, etc. ` +
   `Character can have some items, skills, spells, etc.\n\n` +
   `Game description:\n` +
-  `"""${gameDescription}"""\n\n` +
-  `Output must be in JSON format like ` +
-  `{name: "Character name", description: "Character description"}. `;
+  `"""${gameDescription}"""\n\n`;
+export const getNewCharacterDescription = async ({
+  gameDescription,
+}: {
+  gameDescription: string;
+}) => {
+  const message = addUserContext(
+    getNewCharacterDescriptionPrompt({
+      gameDescription,
+      language: Language.Ru,
+    }),
+  );
+  const response = await openai.createChatCompletion({
+    // function_call: 'auto',
+    // functions: [setCharacterDataFunction()],
+    messages: [message],
+    model: 'gpt-4',
+    temperature: 0.7,
+  });
 
+  const text = response.data.choices[0].message?.content;
+  if (!text) {
+    throw new Error(locale.ru.errors.noTextInResponse);
+  }
+
+  return text;
+};
+
+type GetNewCharacterNamePromptData = {
+  characterDescription: string;
+  language: Language;
+};
+const getNewCharacterNamePrompt = ({
+  language,
+  characterDescription,
+}: GetNewCharacterNamePromptData) =>
+  `You're a game master. ` +
+  `You're in charge of a game that is similar to Dungeon and Dragons. ` +
+  `Make a short name in ${language} for a new character based on the description ` +
+  `provided between """ below:\n\n` +
+  `"""${characterDescription}"""`;
+type GetNewCharacterNameData = {
+  characterDescription: string;
+};
+export const getNewCharacterName = async ({
+  characterDescription,
+}: GetNewCharacterNameData) => {
+  const message = addUserContext(
+    getNewCharacterNamePrompt({
+      characterDescription,
+      language: Language.Ru,
+    }),
+  );
+  const response = await openai.createChatCompletion({
+    messages: [message],
+    model: 'gpt-4',
+    temperature: 0.7,
+  });
+
+  const text = response.data.choices[0].message?.content;
+  if (!text) {
+    throw new Error(locale.ru.errors.noTextInResponse);
+  }
+
+  return text;
+};
+
+// ====================================================
+// ====================================================
+// ====================================================
+
+const getNewGameDescriptionPrompt = (language: Language) =>
+  `You're a game master. ` +
+  `You're in charge of a game that is similar to Dungeon and Dragons ` +
+  `roleplay game but with a simplier rules. ` +
+  `Your task is to make a quest for a new game in ${language} language.` +
+  `You can use any fantasy setting you want. ` +
+  `Describe a world briefly, its inhabitants and where the heroes located. ` +
+  `Describe a quest that players will have to complete. ` +
+  `All description should not be longer than 500 characters. ` +
+  markdownRules;
 /**
  * Make a new game description.
  */
@@ -109,29 +185,19 @@ export const getNewGameDescription = async () => {
   return text;
 };
 
-export const getNewCharacter = async ({
-  gameDescription,
-}: {
+type GetNewGameNamePromptData = {
   gameDescription: string;
-}) => {
-  const message = addSystemContext(
-    getNewCharacterPrompt({ gameDescription, language: Language.Ru }),
-  );
-  const response = await openai.createChatCompletion({
-    // function_call: 'auto',
-    // functions: [setCharacterDataFunction()],
-    messages: [message],
-    model: 'gpt-4',
-    temperature: 0.7,
-  });
-
-  const text = response.data.choices[0].message?.content;
-  if (!text) {
-    throw new Error(locale.ru.errors.noTextInResponse);
-  }
-
-  return JSON.parse(text) as { description: string; name: string };
+  language: Language;
 };
+const getNewGameNamePrompt = ({
+  language,
+  gameDescription,
+}: GetNewGameNamePromptData) =>
+  `You're a game master. ` +
+  `You're in charge of a game that is similar to Dungeon and Dragons. ` +
+  `Make a short name in ${language} for a new game based on the description ` +
+  `provided between """ below:\n\n` +
+  `"""${gameDescription}"""`;
 
 /**
  * Make a new game name based on description.
@@ -139,7 +205,10 @@ export const getNewCharacter = async ({
  * @param description Game description.
  */
 export const getNewGameName = async (description: string) => {
-  const propmpt = getNewGameNamePrompt(Language.Ru) + `"""${description}"""`;
+  const propmpt = getNewGameNamePrompt({
+    gameDescription: description,
+    language: Language.Ru,
+  });
   const message = addSystemContext(propmpt);
   const response = await openai.createChatCompletion({
     messages: [message],
@@ -155,13 +224,36 @@ export const getNewGameName = async (description: string) => {
   return text;
 };
 
+// ====================================================
+// ====================================================
+// ====================================================
+
+const getTranslateToEnglishPrompt = (text: string) =>
+  `Translate text below between """ into English:\n\n"""${text}"""`;
+export const translateToEnglish = async (toTranslate: string) => {
+  const message = addUserContext(getTranslateToEnglishPrompt(toTranslate));
+  const response = await openai.createChatCompletion({
+    messages: [message],
+    model: 'gpt-3.5-turbo',
+  });
+
+  const text = response.data.choices[0].message?.content;
+  if (!text) {
+    throw new Error(locale.ru.errors.noTextInResponse);
+  }
+
+  return text;
+};
+
 /**
  * Generate an image based on text provided.
  * Useful to generate any kind of images for games views, characters portraits, etc.
  */
 export const getImage = async (text: string) => {
+  // DALL-E works much better with English text.
+  const translated = await translateToEnglish(text);
   const response = await openai.createImage({
-    prompt: text,
+    prompt: translated,
     response_format: 'url',
     size: '512x512',
   });

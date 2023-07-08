@@ -1,7 +1,8 @@
 import { characterModel, gameModel } from './database';
 import {
   getImage,
-  getNewCharacter,
+  getNewCharacterDescription,
+  getNewCharacterName,
   getNewGameDescription,
   getNewGameName,
 } from 'ai';
@@ -26,8 +27,10 @@ export const startNewGame = async (context: BotContext) => {
   });
   const gamePictureUrl = await getImage(gameDescription);
 
-  const { name: characterName, description: characterDescription } =
-    await getNewCharacter({ gameDescription });
+  const characterDescription = await getNewCharacterDescription({
+    gameDescription,
+  });
+  const characterName = await getNewCharacterName({ characterDescription });
   const character = await characterModel.create({
     data: {
       description: characterDescription,
