@@ -14,29 +14,25 @@ const configuration = new Configuration({
 });
 export const openai = new OpenAIApi(configuration);
 
-export const addSystemContext = (
-  text: string,
-): ChatCompletionRequestMessage => {
+export const addSystemContext = (text: string) => {
   return {
     content: text,
     role: 'system',
-  };
+  } as ChatCompletionRequestMessage;
 };
 
-export const addAssistantContext = (
-  text: string,
-): ChatCompletionRequestMessage => {
+export const addAssistantContext = (text: string) => {
   return {
     content: text,
     role: 'assistant',
-  };
+  } as ChatCompletionRequestMessage;
 };
 
-export const addUserContext = (text: string): ChatCompletionRequestMessage => {
+export const addUserContext = (text: string) => {
   return {
     content: text,
     role: 'user',
-  };
+  } as ChatCompletionRequestMessage;
 };
 
 /**
@@ -130,22 +126,22 @@ export const getImage = async (text: string) => {
   return url;
 };
 
-export const getAiResponse = async (
-  prompt: string,
-  context: ChatCompletionRequestMessage[] = [],
-  model = 'gpt-4-32k',
-) => {
-  const userMessage = addUserContext(prompt);
-  const messages = [...context, userMessage];
-  const response = await openai.createChatCompletion({
-    messages,
-    model,
-  });
+// export const getAiResponse = async (
+//   prompt: string,
+//   context: ChatCompletionRequestMessage[] = [],
+//   model = 'gpt-4-32k',
+// ) => {
+//   const userMessage = addUserContext(prompt);
+//   const messages = [...context, userMessage];
+//   const response = await openai.createChatCompletion({
+//     messages,
+//     model,
+//   });
 
-  const text = response.data.choices[0].message?.content;
-  if (!text) {
-    throw new Error('No text in response');
-  }
+//   const text = response.data.choices[0].message?.content;
+//   if (!text) {
+//     throw new Error('No text in response');
+//   }
 
-  return text;
-};
+//   return text;
+// };
