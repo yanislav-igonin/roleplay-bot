@@ -36,7 +36,9 @@ export const startNewGame = async (context: BotContext) => {
     caption: `*${gameName}*\n\n${gameDescription}`,
     parse_mode: 'Markdown',
   });
-  const message1 = await context.replyWithMediaGroup([gamePictureMediaGroup]);
+  const questMessage = await context.replyWithMediaGroup([
+    gamePictureMediaGroup,
+  ]);
 
   const characterPictureMediaGroup = InputMediaBuilder.photo(
     characterPictureUrl,
@@ -46,6 +48,8 @@ export const startNewGame = async (context: BotContext) => {
     },
   );
   await context.replyWithMediaGroup([characterPictureMediaGroup], {
-    reply_to_message_id: message1[0].message_id,
+    reply_to_message_id: questMessage[0].message_id,
   });
+
+  const;
 };
