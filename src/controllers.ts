@@ -51,5 +51,5 @@ export const startNewGame = async (context: BotContext) => {
     reply_to_message_id: questMessage[0].message_id,
   });
 
-  const;
+  // const;
 };
