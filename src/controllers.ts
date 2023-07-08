@@ -1,10 +1,5 @@
 import { characterModel, gameModel } from './database';
-import {
-  getImage,
-  getNewCharacter,
-  getNewGameDescription,
-  getNewGameName,
-} from 'ai/ai';
+import { getImage, getNewCharacter, getNewGame } from 'ai/ai';
 import { type BotContext } from 'context';
 import { InputMediaBuilder } from 'grammy';
 import { locale } from 'locale';
@@ -15,8 +10,7 @@ export const startNewGame = async (context: BotContext) => {
   await context.reply(locale.ru.replies.startingNewGame);
   await context.replyWithChatAction('typing');
 
-  const gameDescription = await getNewGameDescription();
-  const gameName = await getNewGameName(gameDescription);
+  const { description: gameDescription, name: gameName } = await getNewGame();
   const game = await gameModel.create({
     data: {
       createdByUserId: user.id,
