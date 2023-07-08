@@ -5,6 +5,7 @@ import {
 } from './prompts';
 import { config } from '@/config';
 import { logger } from '@/logger';
+import { JsonParseError } from 'error';
 import { locale } from 'locale';
 import { type ChatCompletionRequestMessage } from 'openai';
 import { Configuration, OpenAIApi } from 'openai';
@@ -51,15 +52,8 @@ export const getNewGame = async () => {
   try {
     const parsed = JSON.parse(text) as { description: string; name: string };
     return parsed;
-  } catch (error) {
-    logger.error(
-      'parsing new game data error\n',
-      'model response:',
-      text,
-      '\nerror:',
-      error,
-    );
-    throw error;
+  } catch {
+    throw new JsonParseError('parsing new game data error', text);
   }
 };
 
@@ -79,15 +73,8 @@ export const getNewCharacter = async (gameDescription: string) => {
   try {
     const parsed = JSON.parse(text) as { description: string; name: string };
     return parsed;
-  } catch (error) {
-    logger.error(
-      'parsing new character data error\n',
-      'model response:',
-      text,
-      '\nerror:',
-      error,
-    );
-    throw error;
+  } catch {
+    throw new JsonParseError('parsing new character data error', text);
   }
 };
 
