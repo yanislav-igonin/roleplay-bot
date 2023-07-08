@@ -25,7 +25,7 @@ export const getNewGamePrompt = (language = Language.Ru) =>
   `Describe a quest that players will have to complete.\n` +
   `All description should not be longer than 1000 characters.\n` +
   `${markdownRules}\n` +
-  `Use line breaks to separate paragraphs.\n` +
+  `Use \n symbol as a line breaks to separate paragraphs.\n` +
   `Format output as a JSON - ` +
   `{"name": "Game name", "description": "Game description"}.`;
 
@@ -44,7 +44,7 @@ export const getNewCharacterPrompt = (
   `description, or invent your own, but it should fit in the game world),` +
   `personality, background, etc.\n` +
   `Character can have some items, skills, spells, etc.\n` +
-  `Use line breaks to separate paragraphs.\n` +
+  `Use \n symbol as a line breaks to separate paragraphs.\n` +
   `Format output as a JSON - ` +
   `{"name": "Character name", "description": "Character description"}.\n` +
   `Game description:\n` +
