@@ -44,6 +44,7 @@ export const getNewCharacterPrompt = (
   `description, or invent your own, but it should fit in the game world),` +
   `personality, background, etc.\n` +
   `Character can have some items, skills, spells, etc.\n` +
+  `Use line breaks to separate paragraphs.\n` +
   `Format output as a JSON - ` +
   `{"name": "Character name", "description": "Character description"}.\n` +
   `Game description:\n` +
