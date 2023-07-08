@@ -4,6 +4,7 @@ import {
   getTranslateToEnglishPrompt,
 } from './prompts';
 import { config } from '@/config';
+import { logger } from '@/logger';
 import { locale } from 'locale';
 import { type ChatCompletionRequestMessage } from 'openai';
 import { Configuration, OpenAIApi } from 'openai';
@@ -47,7 +48,19 @@ export const getNewGame = async () => {
     throw new Error(locale.ru.errors.noTextInResponse);
   }
 
-  return JSON.parse(text) as { description: string; name: string };
+  try {
+    const parsed = JSON.parse(text) as { description: string; name: string };
+    return parsed;
+  } catch (error) {
+    logger.error(
+      'parsing new game data error\n',
+      'model response:',
+      text,
+      '\nerror:',
+      error,
+    );
+    throw error;
+  }
 };
 
 export const getNewCharacter = async (gameDescription: string) => {
@@ -63,7 +76,19 @@ export const getNewCharacter = async (gameDescription: string) => {
     throw new Error(locale.ru.errors.noTextInResponse);
   }
 
-  return JSON.parse(text) as { description: string; name: string };
+  try {
+    const parsed = JSON.parse(text) as { description: string; name: string };
+    return parsed;
+  } catch (error) {
+    logger.error(
+      'parsing new character data error\n',
+      'model response:',
+      text,
+      '\nerror:',
+      error,
+    );
+    throw error;
+  }
 };
 
 const translateToEnglish = async (text: string) => {
