@@ -8,6 +8,10 @@ type Locale = {
   buttons: {
     newGame: string;
   };
+  errors: {
+    noImageUrlInResponse: string;
+    noTextInResponse: string;
+  };
   replies: {
     error: string;
     help: string;
@@ -21,6 +25,10 @@ export const locale: Record<Locales, Locale> = {
   [Locales.Ru]: {
     buttons: {
       newGame: 'Новая игра',
+    },
+    errors: {
+      noImageUrlInResponse: 'В ответе нейросети нету ссылки на изображение',
+      noTextInResponse: 'В ответе нейросети нет текста',
     },
     replies: {
       error: 'Произошла какая-то ошибка',

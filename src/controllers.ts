@@ -11,8 +11,10 @@ import { locale } from 'locale';
 
 export const startNewGame = async (context: BotContext) => {
   const { user } = context.state;
+
   await context.reply(locale.ru.replies.startingNewGame);
   await context.replyWithChatAction('typing');
+
   const gameDescription = await getNewGameDescription();
   const gameName = await getNewGameName(gameDescription);
   const game = await gameModel.create({

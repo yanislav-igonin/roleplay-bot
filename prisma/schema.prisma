@@ -33,7 +33,7 @@ model Game {
   createdByUser   User        @relation(fields: [createdByUserId], references: [id])
   createdAt       DateTime    @default(now())
   contexts        Context[]
-  characters       Character[]
+  characters      Character[]
 
   @@map("games")
 }
@@ -62,15 +62,15 @@ model Item {
 }
 
 model Character {
-  id          Int         @id @default(autoincrement())
+  id          Int      @id @default(autoincrement())
   name        String
   description String
   gameId      Int
-  game        Game        @relation(fields: [gameId], references: [id])
+  game        Game     @relation(fields: [gameId], references: [id])
   userId      String
-  user        User        @relation(fields: [userId], references: [id])
-  createdAt   DateTime    @default(now())
-  items   Item[]
+  user        User     @relation(fields: [userId], references: [id])
+  createdAt   DateTime @default(now())
+  items       Item[]
 
   @@map("characters")
 }

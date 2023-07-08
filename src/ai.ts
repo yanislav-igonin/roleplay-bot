@@ -1,5 +1,5 @@
 import { config } from '@/config';
-import { Language } from 'locale';
+import { Language, locale } from 'locale';
 import { type ChatCompletionRequestMessage } from 'openai';
 import { Configuration, OpenAIApi } from 'openai';
 
@@ -77,9 +77,7 @@ const getNewCharacterPrompt = ({
   `You're in charge of a game that is similar to Dungeon and Dragons. ` +
   `Make a new character for the game (game description provided below between` +
   `""") in ${language} language. ` +
-  `Output must be in json format like ` +
-  `{name: "Character name",Q description: "Character description"}. ` +
-  `Character description should not be longer than 500 characters. ` +
+  `Character description should not be longer than 300 characters. ` +
   `Character descrpition ` +
   markdownRules +
   ` ` +
@@ -88,7 +86,9 @@ const getNewCharacterPrompt = ({
   `personality, background, etc. ` +
   `Character can have some items, skills, spells, etc.\n\n` +
   `Game description:\n` +
-  `"""${gameDescription}"""\n\n`;
+  `"""${gameDescription}"""\n\n` +
+  `Output must be in JSON format like ` +
+  `{name: "Character name", description: "Character description"}. `;
 
 /**
  * Make a new game description.
@@ -103,7 +103,7 @@ export const getNewGameDescription = async () => {
 
   const text = response.data.choices[0].message?.content;
   if (!text) {
-    throw new Error('No text in response');
+    throw new Error(locale.ru.errors.noTextInResponse);
   }
 
   return text;
@@ -118,6 +118,8 @@ export const getNewCharacter = async ({
     getNewCharacterPrompt({ gameDescription, language: Language.Ru }),
   );
   const response = await openai.createChatCompletion({
+    // function_call: 'auto',
+    // functions: [setCharacterDataFunction()],
     messages: [message],
     model: 'gpt-4',
     temperature: 0.7,
@@ -125,7 +127,7 @@ export const getNewCharacter = async ({
 
   const text = response.data.choices[0].message?.content;
   if (!text) {
-    throw new Error('No text in response');
+    throw new Error(locale.ru.errors.noTextInResponse);
   }
 
   return JSON.parse(text) as { description: string; name: string };
@@ -147,7 +149,7 @@ export const getNewGameName = async (description: string) => {
 
   const text = response.data.choices[0].message?.content;
   if (!text) {
-    throw new Error('No text in response');
+    throw new Error(locale.ru.errors.noTextInResponse);
   }
 
   return text;
@@ -165,7 +167,7 @@ export const getImage = async (text: string) => {
   });
   const { url } = response.data.data[0];
   if (!url) {
-    throw new Error('No url in response');
+    throw new Error(locale.ru.errors.noImageUrlInResponse);
   }
 
   return url;
