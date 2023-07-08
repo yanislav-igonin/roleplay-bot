@@ -52,3 +52,6 @@ export const getNewCharacterPrompt = (
   `{"name": "Character name", "description": "Character description"}. ` +
   `Game description:\n` +
   `"""${gameDescription}"""\n\n`;
+
+export const getTranslateToEnglishPrompt = (text: string) =>
+  `Translate the following text to English:\n\n${text}`;

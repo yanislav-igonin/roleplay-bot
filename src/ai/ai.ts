@@ -2,6 +2,7 @@ import {
   getNewCharacterPrompt,
   getNewGameDescriptionPrompt,
   getNewGameNamePrompt,
+  getTranslateToEnglishPrompt,
 } from './prompts';
 import { config } from '@/config';
 import { Language, locale } from 'locale';
@@ -95,13 +96,29 @@ export const getNewGameName = async (description: string) => {
   return text;
 };
 
+const translateToEnglish = async (text: string) => {
+  const message = addUserContext(getTranslateToEnglishPrompt(text));
+  const response = await openai.createChatCompletion({
+    messages: [message],
+    model: 'gpt-3.5-turbo',
+  });
+
+  const textResponse = response.data.choices[0].message?.content;
+  if (!textResponse) {
+    throw new Error(locale.ru.errors.noTextInResponse);
+  }
+
+  return textResponse;
+};
+
 /**
  * Generate an image based on text provided.
  * Useful to generate any kind of images for games views, characters portraits, etc.
  */
 export const getImage = async (text: string) => {
+  const translatedText = await translateToEnglish(text);
   const response = await openai.createImage({
-    prompt: text,
+    prompt: translatedText,
     response_format: 'url',
     size: '512x512',
   });
