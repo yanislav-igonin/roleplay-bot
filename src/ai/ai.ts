@@ -4,7 +4,6 @@ import {
   getTranslateToEnglishPrompt,
 } from './prompts';
 import { config } from '@/config';
-import { logger } from '@/logger';
 import { JsonParseError } from 'error';
 import { locale } from 'locale';
 import { type ChatCompletionRequestMessage } from 'openai';
