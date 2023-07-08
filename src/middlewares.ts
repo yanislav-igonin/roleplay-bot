@@ -40,10 +40,10 @@ export const userMiddleware = async (
     return;
   }
 
-  const { id: userId } = user;
+  const { id: telegramUserId } = user;
 
   const databaseUser = await userModel.findUnique({
-    where: { id: userId.toString() },
+    where: { telegramId: telegramUserId.toString() },
   });
   if (databaseUser) {
     // eslint-disable-next-line require-atomic-updates
@@ -62,9 +62,9 @@ export const userMiddleware = async (
 
   const toCreate = {
     firstName: valueOrNull(firstName),
-    id: userId.toString(),
     language: valueOrNull(language),
     lastName: valueOrNull(lastName),
+    telegramId: telegramUserId.toString(),
     username: valueOrNull(username),
   };
 

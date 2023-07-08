@@ -11,14 +11,14 @@ datasource db {
 }
 
 model User {
-  id         String      @id
+  id         Int         @id @default(autoincrement())
+  telegramId String      @unique
   username   String?     @unique
   firstName  String?
   lastName   String?
   language   String?
   isAllowed  Boolean     @default(false)
   createdAt  DateTime    @default(now())
-  contexts   Context[]
   games      Game[]
   characters Character[]
 
@@ -29,7 +29,7 @@ model Game {
   id              Int         @id @default(autoincrement())
   name            String
   description     String
-  createdByUserId String
+  createdByUserId Int
   createdByUser   User        @relation(fields: [createdByUserId], references: [id])
   createdAt       DateTime    @default(now())
   contexts        Context[]
@@ -39,12 +39,13 @@ model Game {
 }
 
 model Context {
-  id        Int      @id @default(autoincrement())
-  gameId    Int
-  game      Game     @relation(fields: [gameId], references: [id])
-  userId    String
-  user      User     @relation(fields: [userId], references: [id])
-  createdAt DateTime @default(now())
+  id          Int       @id @default(autoincrement())
+  telegramId  String    @unique
+  gameId      Int
+  game        Game      @relation(fields: [gameId], references: [id])
+  characterId Int
+  character   Character @relation(fields: [characterId], references: [id])
+  createdAt   DateTime  @default(now())
 
   @@map("contexts")
 }
@@ -62,15 +63,16 @@ model Item {
 }
 
 model Character {
-  id          Int      @id @default(autoincrement())
+  id          Int       @id @default(autoincrement())
   name        String
   description String
   gameId      Int
-  game        Game     @relation(fields: [gameId], references: [id])
-  userId      String
-  user        User     @relation(fields: [userId], references: [id])
-  createdAt   DateTime @default(now())
+  game        Game      @relation(fields: [gameId], references: [id])
+  userId      Int
+  user        User      @relation(fields: [userId], references: [id])
+  createdAt   DateTime  @default(now())
   items       Item[]
+  contexts     Context[]
 
   @@map("characters")
 }
