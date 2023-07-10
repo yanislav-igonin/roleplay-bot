@@ -1,6 +1,7 @@
 import {
   getNewCharacterPrompt,
   getNewGamePrompt,
+  getSummaryForImageGenerationPrompt,
   getTranslateToEnglishPrompt,
 } from './prompts';
 import { config } from '@/config';
@@ -79,6 +80,21 @@ export const getNewCharacter = async (gameDescription: string) => {
 
 const translateToEnglish = async (text: string) => {
   const message = addUserContext(getTranslateToEnglishPrompt(text));
+  const response = await openai.createChatCompletion({
+    messages: [message],
+    model: 'gpt-3.5-turbo',
+  });
+
+  const textResponse = response.data.choices[0].message?.content;
+  if (!textResponse) {
+    throw new Error(locale.ru.errors.noTextInResponse);
+  }
+
+  return textResponse;
+};
+
+export const getSummaryForImageGeneration = async (text: string) => {
+  const message = addUserContext(getSummaryForImageGenerationPrompt(text));
   const response = await openai.createChatCompletion({
     messages: [message],
     model: 'gpt-3.5-turbo',

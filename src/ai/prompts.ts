@@ -50,5 +50,11 @@ export const getNewCharacterPrompt = (
   `Game description:\n` +
   `"""${gameDescription}"""\n\n`;
 
+export const getSummaryForImageGenerationPrompt = (text: string) =>
+  `Extract and summarize from the text below between """ descriptions of landscapes, characters, apearance, ` +
+  `things, and what is around. Summary should look like "A picture of a man with big brown beard, large nose, etc."` +
+  `\nText:` +
+  `"""${text}"""`;
+
 export const getTranslateToEnglishPrompt = (text: string) =>
   `Translate the following text to English:\n\n${text}`;
