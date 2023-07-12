@@ -113,7 +113,8 @@ export const getSummaryForImageGeneration = async (text: string) => {
  * Useful to generate any kind of images for games views, characters portraits, etc.
  */
 export const getImage = async (text: string) => {
-  const translatedText = await translateToEnglish(text);
+  const withStyling = `${text}\n\nStyle: Fantasy portrait or landscape\n\n`;
+  const translatedText = await translateToEnglish(withStyling);
   const response = await openai.createImage({
     prompt: translatedText,
     response_format: 'url',

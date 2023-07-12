@@ -1,4 +1,5 @@
 import { characterModel, gameModel } from './database';
+import { logger } from './logger';
 import {
   getImage,
   getNewCharacter,
@@ -26,7 +27,7 @@ export const startNewGame = async (context: BotContext) => {
   const summarizedGameDescription = await getSummaryForImageGeneration(
     gameDescription,
   );
-  console.log(summarizedGameDescription);
+  logger.info(summarizedGameDescription);
   const gamePictureUrl = await getImage(summarizedGameDescription);
 
   const { name: characterName, description: characterDescription } =
@@ -42,7 +43,7 @@ export const startNewGame = async (context: BotContext) => {
   const summarizedCharacterDescription = await getSummaryForImageGeneration(
     characterDescription,
   );
-  console.log(summarizedCharacterDescription);
+  logger.info(summarizedCharacterDescription);
   const characterPictureUrl = await getImage(summarizedCharacterDescription);
 
   const gamePictureMediaGroup = InputMediaBuilder.photo(gamePictureUrl, {

@@ -51,8 +51,16 @@ export const getNewCharacterPrompt = (
   `"""${gameDescription}"""\n\n`;
 
 export const getSummaryForImageGenerationPrompt = (text: string) =>
-  `Extract and summarize from the text below between """ descriptions of landscapes, characters, apearance, ` +
-  `things, and what is around. Summary should look like "A picture of a man with big brown beard, large nose, etc."` +
+  `Extract and summarize from the text below between """ descriptions of ` +
+  `landscapes, descriptions of characters appearance.\n` +
+  `Do not extract any information that is not related to apperances or a landscapes views.\n` +
+  `If text doesn't contain such descriptions, just make your own ` +
+  `based on the text information.\n` +
+  `For landscapes summary should look like: ` +
+  `"A picture of a forest with a river, etc.".\n` +
+  `For characters summary should look like: ` +
+  `"A picture of a man with big brown beard, large nose, etc."` +
+  `Be concise, description should be no longer than 150 characters.` +
   `\nText:` +
   `"""${text}"""`;
 
