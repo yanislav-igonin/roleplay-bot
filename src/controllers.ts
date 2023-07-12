@@ -1,5 +1,11 @@
 import { characterModel, gameModel } from './database';
-import { getImage, getNewCharacter, getNewGame } from 'ai/ai';
+import { logger } from './logger';
+import {
+  getImage,
+  getNewCharacter,
+  getNewGame,
+  getSummaryForImageGeneration,
+} from 'ai';
 import { type BotContext } from 'context';
 import { InputMediaBuilder } from 'grammy';
 import { locale } from 'locale';
@@ -18,7 +24,11 @@ export const startNewGame = async (context: BotContext) => {
       name: gameName,
     },
   });
-  const gamePictureUrl = await getImage(gameDescription);
+  const summarizedGameDescription = await getSummaryForImageGeneration(
+    gameDescription,
+  );
+  logger.info(summarizedGameDescription);
+  const gamePictureUrl = await getImage(summarizedGameDescription);
 
   const { name: characterName, description: characterDescription } =
     await getNewCharacter(gameDescription);
@@ -30,7 +40,11 @@ export const startNewGame = async (context: BotContext) => {
       userId: user.id,
     },
   });
-  const characterPictureUrl = await getImage(characterDescription);
+  const summarizedCharacterDescription = await getSummaryForImageGeneration(
+    characterDescription,
+  );
+  logger.info(summarizedCharacterDescription);
+  const characterPictureUrl = await getImage(summarizedCharacterDescription);
 
   const gamePictureMediaGroup = InputMediaBuilder.photo(gamePictureUrl, {
     caption: `*${gameName}*\n\n${gameDescription}`,

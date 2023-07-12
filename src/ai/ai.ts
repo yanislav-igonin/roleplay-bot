@@ -1,6 +1,7 @@
 import {
   getNewCharacterPrompt,
   getNewGamePrompt,
+  getSummaryForImageGenerationPrompt,
   getTranslateToEnglishPrompt,
 } from './prompts';
 import { config } from '@/config';
@@ -92,12 +93,28 @@ const translateToEnglish = async (text: string) => {
   return textResponse;
 };
 
+export const getSummaryForImageGeneration = async (text: string) => {
+  const message = addUserContext(getSummaryForImageGenerationPrompt(text));
+  const response = await openai.createChatCompletion({
+    messages: [message],
+    model: 'gpt-3.5-turbo',
+  });
+
+  const textResponse = response.data.choices[0].message?.content;
+  if (!textResponse) {
+    throw new Error(locale.ru.errors.noTextInResponse);
+  }
+
+  return textResponse;
+};
+
 /**
  * Generate an image based on text provided.
  * Useful to generate any kind of images for games views, characters portraits, etc.
  */
 export const getImage = async (text: string) => {
-  const translatedText = await translateToEnglish(text);
+  const withStyling = `${text}\n\nStyle: Fantasy portrait or landscape\n\n`;
+  const translatedText = await translateToEnglish(withStyling);
   const response = await openai.createImage({
     prompt: translatedText,
     response_format: 'url',
