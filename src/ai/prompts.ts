@@ -94,3 +94,6 @@ export const getDiceResultPrompt = (diceResult: number) =>
 
 export const getUsedLanguagePrompt = (language = 'Russian') =>
   `All output should be in ${language} language.\n`;
+
+export const shortReplyPrompt =
+  'Output should be no longer than 500 characters.\n';
