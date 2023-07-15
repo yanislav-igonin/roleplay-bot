@@ -148,8 +148,6 @@ export const reply = async (botContext: BotContext) => {
     throw new Error(locale.ru.errors.somethingWentWrong);
   }
 
-  await botContext.replyWithChatAction('typing');
-
   const allContexts = await contextModel.findMany({
     orderBy: { createdAt: 'asc' },
     where: { gameId: game.id },
@@ -177,6 +175,8 @@ export const reply = async (botContext: BotContext) => {
   const diceResult = d20();
   await botContext.reply(`${locale.ru.replies.diceResult}${diceResult}`);
   const diceResultText = getDiceResultPrompt(diceResult);
+
+  await botContext.replyWithChatAction('typing');
 
   const fullUserMessageText = messageText + `\n\n` + diceResultText;
   await contextModel.create({
