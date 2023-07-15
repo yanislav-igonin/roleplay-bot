@@ -70,7 +70,11 @@ export const startNewGame = async (context: BotContext) => {
     gameDescription,
     characterDescription,
   );
-  const firstContextMessage = await context.reply(firstContext);
+  const withBeginning = `${locale.ru.replies.ourQuestBegins}\n\n${firstContext}`;
+  const firstContextMessage = await context.reply(withBeginning, {
+    parse_mode: 'Markdown',
+    reply_to_message_id: questMessage[0].message_id,
+  });
   await contextModel.create({
     data: {
       characterId: character.id,

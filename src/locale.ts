@@ -16,6 +16,7 @@ type Locale = {
     error: string;
     help: string;
     notAllowed: string;
+    ourQuestBegins: string;
     start: string;
     startingNewGame: string;
   };
@@ -34,6 +35,7 @@ export const locale: Record<Locales, Locale> = {
       error: 'Произошла какая-то ошибка',
       help: 'Раздел помощи в разработке',
       notAllowed: 'У вас нету доступа',
+      ourQuestBegins: 'Наш квест начинается...',
       start:
         'Привет. Я бот для ведения ролевых партий. ' +
         'Я создам игру и постараюсь провести ее для тебя.',
