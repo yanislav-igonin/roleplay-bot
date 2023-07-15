@@ -1,14 +1,20 @@
 import { characterModel, contextModel, gameModel } from './database';
 import { logger } from './logger';
 import {
+  addAssistantContext,
+  addUserContext,
   getFirstContext,
   getImage,
   getNewCharacter,
   getNewGame,
+  getNextContext,
   getSummaryForImageGeneration,
 } from 'ai';
+import { getDiceResultPrompt, gmPrompt, rulesPrompt } from 'ai/prompts';
 import { type BotContext } from 'context';
+import { d20 } from 'dice';
 import { InputMediaBuilder } from 'grammy';
+import { type Message, type Update } from 'grammy/types';
 import { locale } from 'locale';
 
 export const startNewGame = async (context: BotContext) => {
@@ -77,9 +83,103 @@ export const startNewGame = async (context: BotContext) => {
   });
   await contextModel.create({
     data: {
-      characterId: character.id,
       gameId: game.id,
       telegramId: firstContextMessage.message_id.toString(),
+      text: firstContext,
+    },
+  });
+};
+
+export const reply = async (botContext: BotContext) => {
+  const {
+    message_id: messageId,
+    reply_to_message: messageRepliedOn,
+    text: messageText,
+  } = botContext.message as Message & Update.NonChannel;
+  const botId = botContext.me.id;
+
+  const notReply = messageRepliedOn === undefined;
+  const repliedOnBotsMessage = messageRepliedOn?.from?.id === botId;
+  const repliedOnOthersMessage = !repliedOnBotsMessage;
+
+  if (notReply) {
+    // Do not do anything if message is not a reply
+    return;
+  }
+
+  if (repliedOnOthersMessage) {
+    // Do not do anything if message is a reply to a message from another user
+    return;
+  }
+
+  const previousContext = await contextModel.findUnique({
+    where: { telegramId: messageRepliedOn.message_id.toString() },
+  });
+  if (!previousContext) {
+    // If we replied on a message that is not a context message
+    // TODO: add a reply that this message is not a context message or something like that
+    throw new Error(locale.ru.errors.somethingWentWrong);
+  }
+
+  const game = await gameModel.findUnique({
+    where: { id: previousContext.gameId },
+  });
+  if (!game) {
+    // Thats strange shit, 99% just a typecheck
+    // TODO: add a reply that this message is game message or something like that
+    throw new Error(locale.ru.errors.somethingWentWrong);
+  }
+
+  // Now we'll take each time the same created character to simplify the game
+  // TODO: make different characters for different users
+  const firstCharacter = await characterModel.findFirst({
+    where: { gameId: game.id },
+  });
+  if (!firstCharacter) {
+    // Thats strange shit, 99% just a typecheck
+    // TODO: add a reply that this message is game message or something like that
+    throw new Error(locale.ru.errors.somethingWentWrong);
+  }
+
+  await botContext.replyWithChatAction('typing');
+
+  const allContexts = await contextModel.findMany({
+    orderBy: { createdAt: 'asc' },
+    where: { gameId: game.id },
+  });
+
+  const preparedMessages = allContexts.map((context) => {
+    if (context.characterId) return addUserContext(context.text);
+    return addAssistantContext(context.text);
+  });
+
+  preparedMessages.unshift(addAssistantContext(gmPrompt));
+  preparedMessages.unshift(addAssistantContext(rulesPrompt));
+
+  const diceResultText = getDiceResultPrompt(d20());
+  const fullUserMessageText = messageText + `\n\n` + diceResultText;
+  await contextModel.create({
+    data: {
+      characterId: firstCharacter.id,
+      gameId: game.id,
+      telegramId: messageId.toString(),
+      text: messageText as string, // Type pin
+    },
+  });
+  const userMessage = addUserContext(fullUserMessageText);
+  preparedMessages.push(userMessage);
+
+  const nextContext = await getNextContext(preparedMessages);
+
+  const newTelegramMessage = await botContext.reply(nextContext, {
+    parse_mode: 'Markdown',
+    reply_to_message_id: messageRepliedOn.message_id,
+  });
+  await contextModel.create({
+    data: {
+      gameId: game.id,
+      telegramId: newTelegramMessage.message_id.toString(),
+      text: nextContext,
     },
   });
 };

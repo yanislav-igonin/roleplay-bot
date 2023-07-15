@@ -88,3 +88,6 @@ export const getFirstContextPrompt = (
 
 export const getTranslateToEnglishPrompt = (text: string) =>
   `Translate the following text to English:\n\n${text}`;
+
+export const getDiceResultPrompt = (diceResult: number) =>
+  `You rolled a ${diceResult}.\n`;

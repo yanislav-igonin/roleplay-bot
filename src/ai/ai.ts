@@ -150,22 +150,19 @@ export const getFirstContext = async (
   return textResponse;
 };
 
-// export const getAiResponse = async (
-//   prompt: string,
-//   context: ChatCompletionRequestMessage[] = [],
-//   model = 'gpt-4-32k',
-// ) => {
-//   const userMessage = addUserContext(prompt);
-//   const messages = [...context, userMessage];
-//   const response = await openai.createChatCompletion({
-//     messages,
-//     model,
-//   });
+export const getNextContext = async (
+  messages = [] as ChatCompletionRequestMessage[],
+  model = 'gpt-4-32k',
+) => {
+  const response = await openai.createChatCompletion({
+    messages,
+    model,
+  });
 
-//   const text = response.data.choices[0].message?.content;
-//   if (!text) {
-//     throw new Error('No text in response');
-//   }
+  const text = response.data.choices[0].message?.content;
+  if (!text) {
+    throw new Error('No text in response');
+  }
 
-//   return text;
-// };
+  return text;
+};

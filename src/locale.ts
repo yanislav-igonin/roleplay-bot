@@ -11,6 +11,7 @@ type Locale = {
   errors: {
     noImageUrlInResponse: string;
     noTextInResponse: string;
+    somethingWentWrong: string;
   };
   replies: {
     error: string;
@@ -30,6 +31,7 @@ export const locale: Record<Locales, Locale> = {
     errors: {
       noImageUrlInResponse: 'В ответе нейросети нету ссылки на изображение',
       noTextInResponse: 'В ответе нейросети нет текста',
+      somethingWentWrong: 'Что-то пошло не так, попробуйте еще раз',
     },
     replies: {
       error: 'Произошла какая-то ошибка',
