@@ -10,7 +10,7 @@
 
 import { Language } from 'locale';
 
-const markdownRules =
+export const markdownRules =
   `Text should be formatted in Markdown. ` +
   `You can use ONLY the following formatting without any exceptions:` +
   `**bold text**, *italic text*, ~~strikethrough~~.`;

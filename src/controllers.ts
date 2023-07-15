@@ -15,6 +15,7 @@ import {
   getDiceResultPrompt,
   getUsedLanguagePrompt,
   gmPrompt,
+  markdownRules,
   rulesPrompt,
   shortReplyPrompt,
 } from 'ai/prompts';
@@ -167,6 +168,7 @@ export const reply = async (botContext: BotContext) => {
   preparedMessages.unshift(
     addAssistantContext(`Game description:\n\n${game.description}`),
   );
+  preparedMessages.unshift(addAssistantContext(markdownRules));
   preparedMessages.unshift(addAssistantContext(shortReplyPrompt));
   preparedMessages.unshift(addAssistantContext(rulesPrompt));
   preparedMessages.unshift(addAssistantContext(gmPrompt));
