@@ -60,7 +60,7 @@ export const getSummaryForImageGenerationPrompt = (text: string) =>
   `"A picture of a forest with a river, etc.".\n` +
   `For characters summary should look like: ` +
   `"A picture of a man with big brown beard, large nose, etc."` +
-  `Be concise, description should be no longer than 150 characters.` +
+  `Be concise, description MUST be no longer than 150 characters.` +
   `\nText:` +
   `"""${text}"""`;
 
