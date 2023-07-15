@@ -2,6 +2,7 @@ import { characterModel, contextModel, gameModel } from './database';
 import { logger } from './logger';
 import {
   addAssistantContext,
+  addSystemContext,
   addUserContext,
   getFirstContext,
   getImage,
@@ -10,7 +11,12 @@ import {
   getNextContext,
   getSummaryForImageGeneration,
 } from 'ai';
-import { getDiceResultPrompt, gmPrompt, rulesPrompt } from 'ai/prompts';
+import {
+  getDiceResultPrompt,
+  getUsedLanguagePrompt,
+  gmPrompt,
+  rulesPrompt,
+} from 'ai/prompts';
 import { type BotContext } from 'context';
 import { d20 } from 'dice';
 import { InputMediaBuilder } from 'grammy';
@@ -153,10 +159,15 @@ export const reply = async (botContext: BotContext) => {
     return addAssistantContext(context.text);
   });
 
+  preparedMessages.unshift(addSystemContext(getUsedLanguagePrompt()));
   preparedMessages.unshift(addAssistantContext(gmPrompt));
   preparedMessages.unshift(addAssistantContext(rulesPrompt));
 
-  const diceResultText = getDiceResultPrompt(d20());
+  await botContext.reply(locale.ru.replies.diceRoll);
+  const diceResult = d20();
+  await botContext.reply(`${locale.ru.replies.diceResult}${diceResult}`);
+  const diceResultText = getDiceResultPrompt(diceResult);
+
   const fullUserMessageText = messageText + `\n\n` + diceResultText;
   await contextModel.create({
     data: {

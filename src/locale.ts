@@ -14,6 +14,8 @@ type Locale = {
     somethingWentWrong: string;
   };
   replies: {
+    diceResult: string;
+    diceRoll: string;
     error: string;
     help: string;
     notAllowed: string;
@@ -34,6 +36,8 @@ export const locale: Record<Locales, Locale> = {
       somethingWentWrong: 'Что-то пошло не так, попробуйте еще раз',
     },
     replies: {
+      diceResult: 'Выпало ',
+      diceRoll: 'Вы бросаете кубик...',
       error: 'Произошла какая-то ошибка',
       help: 'Раздел помощи в разработке',
       notAllowed: 'У вас нету доступа',

@@ -91,3 +91,6 @@ export const getTranslateToEnglishPrompt = (text: string) =>
 
 export const getDiceResultPrompt = (diceResult: number) =>
   `You rolled a ${diceResult}.\n`;
+
+export const getUsedLanguagePrompt = (language = 'Russian') =>
+  `All output should be in ${language} language.\n`;

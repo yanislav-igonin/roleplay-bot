@@ -13,6 +13,11 @@ import { Configuration, OpenAIApi } from 'openai';
 
 const configuration = new Configuration({
   apiKey: config.openAiApiKey,
+  // basePath: 'https://openrouter.ai/api/v1',
+  // baseOptions: {
+  //   headers: {
+
+  // }
 });
 export const openai = new OpenAIApi(configuration);
 
@@ -152,7 +157,7 @@ export const getFirstContext = async (
 
 export const getNextContext = async (
   messages = [] as ChatCompletionRequestMessage[],
-  model = 'gpt-4-32k',
+  model = 'gpt-4',
 ) => {
   const response = await openai.createChatCompletion({
     messages,
