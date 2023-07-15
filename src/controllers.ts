@@ -1,6 +1,7 @@
-import { characterModel, gameModel } from './database';
+import { characterModel, contextModel, gameModel } from './database';
 import { logger } from './logger';
 import {
+  getFirstContext,
   getImage,
   getNewCharacter,
   getNewGame,
@@ -63,5 +64,18 @@ export const startNewGame = async (context: BotContext) => {
   );
   await context.replyWithMediaGroup([characterPictureMediaGroup], {
     reply_to_message_id: questMessage[0].message_id,
+  });
+
+  const firstContext = await getFirstContext(
+    gameDescription,
+    characterDescription,
+  );
+  const firstContextMessage = await context.reply(firstContext);
+  await contextModel.create({
+    data: {
+      characterId: character.id,
+      gameId: game.id,
+      telegramId: firstContextMessage.message_id.toString(),
+    },
   });
 };

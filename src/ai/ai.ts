@@ -1,4 +1,5 @@
 import {
+  getFirstContextPrompt,
   getNewCharacterPrompt,
   getNewGamePrompt,
   getSummaryForImageGenerationPrompt,
@@ -126,6 +127,27 @@ export const getImage = async (text: string) => {
   }
 
   return url;
+};
+
+export const getFirstContext = async (
+  gameDescription: string,
+  characterDescription: string,
+) => {
+  const message = addUserContext(
+    getFirstContextPrompt(gameDescription, characterDescription),
+  );
+  const response = await openai.createChatCompletion({
+    messages: [message],
+    model: 'gpt-4',
+    temperature: 0.8,
+  });
+
+  const textResponse = response.data.choices[0].message?.content;
+  if (!textResponse) {
+    throw new Error(locale.ru.errors.noTextInResponse);
+  }
+
+  return textResponse;
 };
 
 // export const getAiResponse = async (

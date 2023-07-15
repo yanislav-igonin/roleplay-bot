@@ -64,5 +64,27 @@ export const getSummaryForImageGenerationPrompt = (text: string) =>
   `\nText:` +
   `"""${text}"""`;
 
+export const gmPrompt =
+  `You're a game master.\n` +
+  `You're in charge of a game that is similar to Dungeon and Dragons.\n`;
+export const rulesPrompt =
+  'Rules is simple: each time players try to do something game master ' +
+  'they should roll a d20 dice for this action.\n' +
+  'Every result equals or higher than 10 is a success.\n';
+
+export const getFirstContextPrompt = (
+  gameDescription: string,
+  characterDescription: string,
+) =>
+  gmPrompt +
+  `Based on the game description and a character description provided below between """ ` +
+  `make a description of where our characters located right now before the quest.\n` +
+  `It can be a tavern, a forest, a cave, etc.\n` +
+  `For the line breaks "\n" symbols should be used.\n` +
+  `Game description:\n` +
+  `"""${gameDescription}"""\n\n` +
+  `Character description:\n` +
+  `"""${characterDescription}"""\n\n`;
+
 export const getTranslateToEnglishPrompt = (text: string) =>
   `Translate the following text to English:\n\n${text}`;
