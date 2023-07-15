@@ -160,8 +160,16 @@ export const reply = async (botContext: BotContext) => {
   });
 
   preparedMessages.unshift(addSystemContext(getUsedLanguagePrompt()));
-  preparedMessages.unshift(addAssistantContext(gmPrompt));
+  preparedMessages.unshift(
+    addAssistantContext(
+      `Character description:\n\n${firstCharacter.description}`,
+    ),
+  );
+  preparedMessages.unshift(
+    addAssistantContext(`Game description:\n\n${game.description}`),
+  );
   preparedMessages.unshift(addAssistantContext(rulesPrompt));
+  preparedMessages.unshift(addAssistantContext(gmPrompt));
 
   await botContext.reply(locale.ru.replies.diceRoll);
   const diceResult = d20();
