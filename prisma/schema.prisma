@@ -39,13 +39,14 @@ model Game {
 }
 
 model Context {
-  id          Int       @id @default(autoincrement())
-  telegramId  String    @unique
+  id          Int        @id @default(autoincrement())
+  text        String
+  telegramId  String     @unique
   gameId      Int
-  game        Game      @relation(fields: [gameId], references: [id])
-  characterId Int
-  character   Character @relation(fields: [characterId], references: [id])
-  createdAt   DateTime  @default(now())
+  game        Game       @relation(fields: [gameId], references: [id])
+  characterId Int?
+  character   Character? @relation(fields: [characterId], references: [id])
+  createdAt   DateTime   @default(now())
 
   @@map("contexts")
 }
@@ -72,7 +73,7 @@ model Character {
   user        User      @relation(fields: [userId], references: [id])
   createdAt   DateTime  @default(now())
   items       Item[]
-  contexts     Context[]
+  contexts    Context[]
 
   @@map("characters")
 }

@@ -1,4 +1,5 @@
 import {
+  getFirstContextPrompt,
   getNewCharacterPrompt,
   getNewGamePrompt,
   getSummaryForImageGenerationPrompt,
@@ -12,6 +13,11 @@ import { Configuration, OpenAIApi } from 'openai';
 
 const configuration = new Configuration({
   apiKey: config.openAiApiKey,
+  // basePath: 'https://openrouter.ai/api/v1',
+  // baseOptions: {
+  //   headers: {
+
+  // }
 });
 export const openai = new OpenAIApi(configuration);
 
@@ -128,22 +134,40 @@ export const getImage = async (text: string) => {
   return url;
 };
 
-// export const getAiResponse = async (
-//   prompt: string,
-//   context: ChatCompletionRequestMessage[] = [],
-//   model = 'gpt-4-32k',
-// ) => {
-//   const userMessage = addUserContext(prompt);
-//   const messages = [...context, userMessage];
-//   const response = await openai.createChatCompletion({
-//     messages,
-//     model,
-//   });
+export const getFirstContext = async (
+  gameDescription: string,
+  characterDescription: string,
+) => {
+  const message = addUserContext(
+    getFirstContextPrompt(gameDescription, characterDescription),
+  );
+  const response = await openai.createChatCompletion({
+    messages: [message],
+    model: 'gpt-4',
+    temperature: 0.8,
+  });
 
-//   const text = response.data.choices[0].message?.content;
-//   if (!text) {
-//     throw new Error('No text in response');
-//   }
+  const textResponse = response.data.choices[0].message?.content;
+  if (!textResponse) {
+    throw new Error(locale.ru.errors.noTextInResponse);
+  }
 
-//   return text;
-// };
+  return textResponse;
+};
+
+export const getNextContext = async (
+  messages = [] as ChatCompletionRequestMessage[],
+  model = 'gpt-4',
+) => {
+  const response = await openai.createChatCompletion({
+    messages,
+    model,
+  });
+
+  const text = response.data.choices[0].message?.content;
+  if (!text) {
+    throw new Error('No text in response');
+  }
+
+  return text;
+};
