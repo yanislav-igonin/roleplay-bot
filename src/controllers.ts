@@ -26,6 +26,9 @@ import { InputMediaBuilder } from 'grammy';
 import { type Message, type Update } from 'grammy/types';
 import { locale } from 'locale';
 
+const getMessageUniqueId = (message: Message) =>
+  `${message.chat.id.toString()}_${message.message_id.toString()}`;
+
 export const startNewGame = async (context: BotContext) => {
   const { user } = context.state;
 
@@ -41,7 +44,7 @@ export const startNewGame = async (context: BotContext) => {
     },
   });
   const summarizedGameDescription = await getSummaryForImageGeneration(
-    gameDescription,
+    gameDescription
   );
   const gamePictureUrl = await getImage(summarizedGameDescription);
 
@@ -56,7 +59,7 @@ export const startNewGame = async (context: BotContext) => {
     },
   });
   const summarizedCharacterDescription = await getSummaryForImageGeneration(
-    characterDescription,
+    characterDescription
   );
   const characterPictureUrl = await getImage(summarizedCharacterDescription);
 
@@ -64,25 +67,17 @@ export const startNewGame = async (context: BotContext) => {
     caption: `*${gameName}*\n\n${gameDescription}`,
     parse_mode: 'Markdown',
   });
-  const questMessage = await context.replyWithMediaGroup([
-    gamePictureMediaGroup,
-  ]);
+  const questMessage = await context.replyWithMediaGroup([gamePictureMediaGroup]);
 
-  const characterPictureMediaGroup = InputMediaBuilder.photo(
-    characterPictureUrl,
-    {
-      caption: `*Персонаж*\n\n${character.name}\n\n${character.description}`,
-      parse_mode: 'Markdown',
-    },
-  );
+  const characterPictureMediaGroup = InputMediaBuilder.photo(characterPictureUrl, {
+    caption: `*Персонаж*\n\n${character.name}\n\n${character.description}`,
+    parse_mode: 'Markdown',
+  });
   await context.replyWithMediaGroup([characterPictureMediaGroup], {
     reply_to_message_id: questMessage[0].message_id,
   });
 
-  const firstContext = await getFirstContext(
-    gameDescription,
-    characterDescription,
-  );
+  const firstContext = await getFirstContext(gameDescription, characterDescription);
   const withBeginning = `${locale.ru.replies.ourQuestBegins}\n\n${firstContext}`;
   const firstContextMessage = await context.reply(withBeginning, {
     parse_mode: 'Markdown',
@@ -93,7 +88,7 @@ export const startNewGame = async (context: BotContext) => {
     data: {
       gameId: game.id,
       summary: firstContextSummary,
-      telegramId: firstContextMessage.message_id.toString(),
+      telegramId: getMessageUniqueId(firstContextMessage),
       text: firstContext,
     },
   });
@@ -122,7 +117,7 @@ export const reply = async (botContext: BotContext) => {
   }
 
   const previousContext = await contextModel.findUnique({
-    where: { telegramId: messageRepliedOn.message_id.toString() },
+    where: { telegramId: getMessageUniqueId(messageRepliedOn) },
   });
   if (!previousContext) {
     // If we replied on a message that is not a context message
@@ -163,10 +158,10 @@ export const reply = async (botContext: BotContext) => {
 
   preparedMessages.unshift(addSystemContext(getUsedLanguagePrompt()));
   preparedMessages.unshift(
-    addSystemContext(`Character description:\n\n${firstCharacter.description}`),
+    addSystemContext(`Character description:\n\n${firstCharacter.description}`)
   );
   preparedMessages.unshift(
-    addSystemContext(`Game description:\n\n${game.description}`),
+    addSystemContext(`Game description:\n\n${game.description}`)
   );
   preparedMessages.unshift(addSystemContext(markdownRules));
   preparedMessages.unshift(addSystemContext(shortReplyPrompt));
@@ -186,7 +181,7 @@ export const reply = async (botContext: BotContext) => {
       characterId: firstCharacter.id,
       gameId: game.id,
       summary: messageText,
-      telegramId: messageId.toString(),
+      telegramId: getMessageUniqueId(botContext.message!),
       text: messageText as string,
     },
   });
@@ -205,7 +200,7 @@ export const reply = async (botContext: BotContext) => {
     data: {
       gameId: game.id,
       summary: nextContextSummary,
-      telegramId: newTelegramMessage.message_id.toString(),
+      telegramId: getMessageUniqueId(newTelegramMessage),
       text: nextContext,
     },
   });

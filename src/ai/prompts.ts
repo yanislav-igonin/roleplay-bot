@@ -16,6 +16,8 @@ export const markdownRules =
   `You can use ONLY the following formatting without any exceptions:` +
   `**bold text**, *italic text*, ~~strikethrough~~.`;
 
+const lineBreaksPrompt = `For the line breaks "\n" symbols should be used, DO NOT USE ACTUAL LINE BREAK.\n`;
+
 export const getNewGamePrompt = (language = Language.Ru) =>
   `Your task is to make a quest for a new roleplay game in ${language} language.\n` +
   `You can use any setting you want.\n` +
@@ -23,7 +25,7 @@ export const getNewGamePrompt = (language = Language.Ru) =>
   `Describe a quest that players will have to complete.\n` +
   `All description should not be longer than 1000 characters.\n` +
   `${markdownRules}\n` +
-  `For the line breaks "\n" symbols should be used, DO NOT USE ACTUAL LINE BREAK.\n` +
+  lineBreaksPrompt +
   `Format output as a JSON - ` +
   `{"name": "Game name", "description": "Game description"}.`;
 
@@ -39,10 +41,10 @@ export const getNewCharacterPrompt = (
   `Describe a character's appearance, race (based on any provided in the game ` +
   `description, or invent your own, but it should fit in the game world),` +
   `personality, background, etc.\n` +
-  `Be creative, do not create only basic fantasy races like dwarfes, ghnomes, elves, humans. ` +
-  `You can generate also some other races like goblins, centaurus, etc.\n` +
+  `Be creative, you can create not only the basic fantasy races like dwarfes, ghnomes, elves, humans, ` +
+  `but also other different races like goblins, centaur, trolls, orcs, etc. BE CREATIVE.\n` +
   `Character can have some items, skills, spells, etc.\n` +
-  `For the line breaks "\n" symbols should be used, DO NOT USE ACTUAL LINE BREAK.\n` +
+  lineBreaksPrompt +
   `Format output as a JSON - ` +
   `{"name": "Character name", "description": "Character description"}.\n` +
   `Game description:\n` +
@@ -72,7 +74,7 @@ export const getFirstContextPrompt = (
   `make a description of where our characters located right now before the quest.\n` +
   `It can be a tavern, a forest, a cave, etc.\n` +
   `Description should not be longer than 500 characters.\n` +
-  `For the line breaks "\n" symbols should be used.\n` +
+  lineBreaksPrompt +
   `Game description:\n` +
   `"""${gameDescription}"""\n\n` +
   `Character description:\n` +
@@ -91,5 +93,5 @@ export const shortReplyPrompt = 'Output should be no longer than 500 characters.
 
 export const getContextSummaryPrompt = (text: string) =>
   `Create a short summary (150 characters maximum) of the following text` +
-  `enclosed between """. Output MUST be in the same language as text.\n\n` +
+  `enclosed between """. Summary MUST be in the same language as text.\n` +
   `Text: """${text}"""`;
