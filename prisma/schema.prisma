@@ -41,6 +41,7 @@ model Game {
 model Context {
   id          Int        @id @default(autoincrement())
   text        String
+  summary     String     @default("")
   telegramId  String     @unique
   gameId      Int
   game        Game       @relation(fields: [gameId], references: [id])
