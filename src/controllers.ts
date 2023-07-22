@@ -155,9 +155,10 @@ export const reply = async (botContext: BotContext) => {
     where: { gameId: game.id },
   });
 
-  const preparedMessages = allContexts.map((context) => {
-    if (context.characterId) return addUserContext(context.summary);
-    return addAssistantContext(context.summary);
+  const preparedMessages = allContexts.map(({ summary, text, characterId }) => {
+    const toAdd = summary ? summary : text;
+    if (characterId) return addUserContext(toAdd);
+    return addAssistantContext(toAdd);
   });
 
   preparedMessages.unshift(addSystemContext(getUsedLanguagePrompt()));
