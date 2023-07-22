@@ -1,13 +1,3 @@
-// const gameRules =
-//   `Each time players try to do something game master` +
-//   `(GM) will roll a d20 dice for this action. ` +
-//   `Every result equals orhigher than 10 is a success. ` +
-//   `If the result is lower than 10 it's a failure. `;
-// const gameMasterPromt =
-//   `You're a game master. ` +
-//   `You're in charge of a game that is similar to Dungeon and Dragons ` +
-//   `roleplay game but with a simplier rules.`;
-
 import { Language } from 'locale';
 
 export const markdownRules =
@@ -43,6 +33,8 @@ export const getNewCharacterPrompt = (
   `Describe a character's appearance, race (based on any provided in the game ` +
   `description, or invent your own, but it should fit in the game world),` +
   `personality, background, etc.\n` +
+  `Be creative, do not create only basic fantasy races like dwarfes, ghnomes, elves, humans. ` +
+  `You can generate also some other races like goblins, centaurus, etc.\n` +
   `Character can have some items, skills, spells, etc.\n` +
   `For the line breaks "\n" symbols should be used.\n` +
   `Format output as a JSON - ` +
@@ -93,7 +85,12 @@ export const getDiceResultPrompt = (diceResult: number) =>
   `You rolled a ${diceResult}.\n`;
 
 export const getUsedLanguagePrompt = (language = 'Russian') =>
-  `All output should be in ${language} language.\n`;
+  `All output always MUST be translated in ${language} language if its not in it.\n`;
 
 export const shortReplyPrompt =
   'Output should be no longer than 500 characters.\n';
+
+export const getContextSummaryPrompt = (text: string) =>
+  `Create a short summary (150 characters maximum) of the following text` +
+  `enclosed between """. Output MUST be in the same language as text.\n\n` +
+  `Text: """${text}"""`;

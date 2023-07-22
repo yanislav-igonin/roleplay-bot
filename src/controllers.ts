@@ -4,6 +4,7 @@ import {
   addAssistantContext,
   addSystemContext,
   addUserContext,
+  getContextSummary,
   getFirstContext,
   getImage,
   getNewCharacter,
@@ -42,7 +43,6 @@ export const startNewGame = async (context: BotContext) => {
   const summarizedGameDescription = await getSummaryForImageGeneration(
     gameDescription,
   );
-  logger.info(summarizedGameDescription);
   const gamePictureUrl = await getImage(summarizedGameDescription);
 
   const { name: characterName, description: characterDescription } =
@@ -58,7 +58,6 @@ export const startNewGame = async (context: BotContext) => {
   const summarizedCharacterDescription = await getSummaryForImageGeneration(
     characterDescription,
   );
-  logger.info(summarizedCharacterDescription);
   const characterPictureUrl = await getImage(summarizedCharacterDescription);
 
   const gamePictureMediaGroup = InputMediaBuilder.photo(gamePictureUrl, {
@@ -89,9 +88,11 @@ export const startNewGame = async (context: BotContext) => {
     parse_mode: 'Markdown',
     reply_to_message_id: questMessage[0].message_id,
   });
+  const firstContextSummary = await getContextSummary(firstContext);
   await contextModel.create({
     data: {
       gameId: game.id,
+      summary: firstContextSummary,
       telegramId: firstContextMessage.message_id.toString(),
       text: firstContext,
     },
@@ -155,23 +156,21 @@ export const reply = async (botContext: BotContext) => {
   });
 
   const preparedMessages = allContexts.map((context) => {
-    if (context.characterId) return addUserContext(context.text);
-    return addAssistantContext(context.text);
+    if (context.characterId) return addUserContext(context.summary);
+    return addAssistantContext(context.summary);
   });
 
   preparedMessages.unshift(addSystemContext(getUsedLanguagePrompt()));
   preparedMessages.unshift(
-    addAssistantContext(
-      `Character description:\n\n${firstCharacter.description}`,
-    ),
+    addSystemContext(`Character description:\n\n${firstCharacter.description}`),
   );
   preparedMessages.unshift(
-    addAssistantContext(`Game description:\n\n${game.description}`),
+    addSystemContext(`Game description:\n\n${game.description}`),
   );
-  preparedMessages.unshift(addAssistantContext(markdownRules));
-  preparedMessages.unshift(addAssistantContext(shortReplyPrompt));
-  preparedMessages.unshift(addAssistantContext(rulesPrompt));
-  preparedMessages.unshift(addAssistantContext(gmPrompt));
+  preparedMessages.unshift(addSystemContext(markdownRules));
+  preparedMessages.unshift(addSystemContext(shortReplyPrompt));
+  preparedMessages.unshift(addSystemContext(rulesPrompt));
+  preparedMessages.unshift(addSystemContext(gmPrompt));
 
   await botContext.reply(locale.ru.replies.diceRoll);
   const diceResult = d20();
@@ -185,14 +184,17 @@ export const reply = async (botContext: BotContext) => {
     data: {
       characterId: firstCharacter.id,
       gameId: game.id,
+      summary: messageText,
       telegramId: messageId.toString(),
-      text: messageText as string, // Type pin
+      text: messageText as string,
     },
   });
   const userMessage = addUserContext(fullUserMessageText);
   preparedMessages.push(userMessage);
+  preparedMessages.push(addSystemContext(getUsedLanguagePrompt()));
 
   const nextContext = await getNextContext(preparedMessages);
+  const nextContextSummary = await getContextSummary(nextContext);
 
   const newTelegramMessage = await botContext.reply(nextContext, {
     parse_mode: 'Markdown',
@@ -201,6 +203,7 @@ export const reply = async (botContext: BotContext) => {
   await contextModel.create({
     data: {
       gameId: game.id,
+      summary: nextContextSummary,
       telegramId: newTelegramMessage.message_id.toString(),
       text: nextContext,
     },
