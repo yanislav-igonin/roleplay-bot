@@ -33,6 +33,8 @@ export const getNewCharacterPrompt = (
   `Describe a character's appearance, race (based on any provided in the game ` +
   `description, or invent your own, but it should fit in the game world),` +
   `personality, background, etc.\n` +
+  `Be creative, do not create only basic fantasy races like dwarfes, ghnomes, elves, humans. ` +
+  `You can generate also some other races like goblins, centaurus, etc.\n` +
   `Character can have some items, skills, spells, etc.\n` +
   `For the line breaks "\n" symbols should be used.\n` +
   `Format output as a JSON - ` +
@@ -83,7 +85,7 @@ export const getDiceResultPrompt = (diceResult: number) =>
   `You rolled a ${diceResult}.\n`;
 
 export const getUsedLanguagePrompt = (language = 'Russian') =>
-  `All output always MUST be in ${language} language.\n`;
+  `All output always MUST be translated in ${language} language if its not in it.\n`;
 
 export const shortReplyPrompt =
   'Output should be no longer than 500 characters.\n';

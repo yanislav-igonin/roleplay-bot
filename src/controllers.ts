@@ -164,17 +164,15 @@ export const reply = async (botContext: BotContext) => {
 
   preparedMessages.unshift(addSystemContext(getUsedLanguagePrompt()));
   preparedMessages.unshift(
-    addAssistantContext(
-      `Character description:\n\n${firstCharacter.description}`,
-    ),
+    addSystemContext(`Character description:\n\n${firstCharacter.description}`),
   );
   preparedMessages.unshift(
-    addAssistantContext(`Game description:\n\n${game.description}`),
+    addSystemContext(`Game description:\n\n${game.description}`),
   );
-  preparedMessages.unshift(addAssistantContext(markdownRules));
-  preparedMessages.unshift(addAssistantContext(shortReplyPrompt));
-  preparedMessages.unshift(addAssistantContext(rulesPrompt));
-  preparedMessages.unshift(addAssistantContext(gmPrompt));
+  preparedMessages.unshift(addSystemContext(markdownRules));
+  preparedMessages.unshift(addSystemContext(shortReplyPrompt));
+  preparedMessages.unshift(addSystemContext(rulesPrompt));
+  preparedMessages.unshift(addSystemContext(gmPrompt));
 
   await botContext.reply(locale.ru.replies.diceRoll);
   const diceResult = d20();
@@ -188,7 +186,6 @@ export const reply = async (botContext: BotContext) => {
     data: {
       characterId: firstCharacter.id,
       gameId: game.id,
-      // Type pin
       summary: messageText,
       telegramId: messageId.toString(),
       text: messageText as string,
@@ -196,6 +193,7 @@ export const reply = async (botContext: BotContext) => {
   });
   const userMessage = addUserContext(fullUserMessageText);
   preparedMessages.push(userMessage);
+  preparedMessages.push(addSystemContext(getUsedLanguagePrompt()));
 
   const nextContext = await getNextContext(preparedMessages);
   const nextContextSummary = await getContextSummary(nextContext);
