@@ -21,7 +21,7 @@ export const getNewGamePrompt = (language = Language.Ru) =>
 
 export const getNewCharacterPrompt = (
   gameDescription: string,
-  language = Language.Ru,
+  language = Language.Ru
 ) =>
   `You're a game master.\n` +
   `You're in charge of a game that is similar to Dungeon and Dragons.\n` +
@@ -62,11 +62,13 @@ export const gmPrompt =
 export const rulesPrompt =
   'Rules is simple: each time players try to do something game master ' +
   'they should roll a d20 dice for this action.\n' +
-  'Every result equals or higher than 10 is a success.\n';
+  'Every result equals or higher than 10 is a success.\n' +
+  '1 and 20 are critical fails and critical successes respectively. ' +
+  'They should produce a more interesting result.';
 
 export const getFirstContextPrompt = (
   gameDescription: string,
-  characterDescription: string,
+  characterDescription: string
 ) =>
   gmPrompt +
   `Based on the game description and a character description provided below between """ ` +
@@ -87,8 +89,7 @@ export const getDiceResultPrompt = (diceResult: number) =>
 export const getUsedLanguagePrompt = (language = 'Russian') =>
   `All output always MUST be translated in ${language} language if its not in it.\n`;
 
-export const shortReplyPrompt =
-  'Output should be no longer than 500 characters.\n';
+export const shortReplyPrompt = 'Output should be no longer than 500 characters.\n';
 
 export const getContextSummaryPrompt = (text: string) =>
   `Create a short summary (150 characters maximum) of the following text` +
