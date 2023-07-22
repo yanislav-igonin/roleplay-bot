@@ -43,7 +43,6 @@ export const startNewGame = async (context: BotContext) => {
   const summarizedGameDescription = await getSummaryForImageGeneration(
     gameDescription,
   );
-  logger.info(summarizedGameDescription);
   const gamePictureUrl = await getImage(summarizedGameDescription);
 
   const { name: characterName, description: characterDescription } =
@@ -59,7 +58,6 @@ export const startNewGame = async (context: BotContext) => {
   const summarizedCharacterDescription = await getSummaryForImageGeneration(
     characterDescription,
   );
-  logger.info(summarizedCharacterDescription);
   const characterPictureUrl = await getImage(summarizedCharacterDescription);
 
   const gamePictureMediaGroup = InputMediaBuilder.photo(gamePictureUrl, {
