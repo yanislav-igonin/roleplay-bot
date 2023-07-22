@@ -1,13 +1,3 @@
-// const gameRules =
-//   `Each time players try to do something game master` +
-//   `(GM) will roll a d20 dice for this action. ` +
-//   `Every result equals orhigher than 10 is a success. ` +
-//   `If the result is lower than 10 it's a failure. `;
-// const gameMasterPromt =
-//   `You're a game master. ` +
-//   `You're in charge of a game that is similar to Dungeon and Dragons ` +
-//   `roleplay game but with a simplier rules.`;
-
 import { Language } from 'locale';
 
 export const markdownRules =
@@ -93,7 +83,7 @@ export const getDiceResultPrompt = (diceResult: number) =>
   `You rolled a ${diceResult}.\n`;
 
 export const getUsedLanguagePrompt = (language = 'Russian') =>
-  `All output should be in ${language} language.\n`;
+  `All output always MUST be in ${language} language.\n`;
 
 export const shortReplyPrompt =
   'Output should be no longer than 500 characters.\n';
