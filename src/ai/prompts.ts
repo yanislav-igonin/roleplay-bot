@@ -97,3 +97,6 @@ export const getUsedLanguagePrompt = (language = 'Russian') =>
 
 export const shortReplyPrompt =
   'Output should be no longer than 500 characters.\n';
+
+export const getContextSummaryPrompt = (text: string) =>
+  `Create a short summary (150 characters maximum) of the following text:\n\n${text}`;

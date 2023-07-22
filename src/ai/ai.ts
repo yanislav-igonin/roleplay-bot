@@ -1,4 +1,5 @@
 import {
+  getContextSummaryPrompt,
   getFirstContextPrompt,
   getNewCharacterPrompt,
   getNewGamePrompt,
@@ -153,6 +154,21 @@ export const getFirstContext = async (
   }
 
   return textResponse;
+};
+
+export const getContextSummary = async (context: string) => {
+  const message = addUserContext(getContextSummaryPrompt(context));
+  const response = await openai.createChatCompletion({
+    messages: [message],
+    model: 'gpt-3.5-turbo',
+  });
+
+  const summary = response.data.choices[0].message?.content;
+  if (!summary) {
+    throw new Error('No text in response');
+  }
+
+  return summary;
 };
 
 export const getNextContext = async (
