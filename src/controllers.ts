@@ -1,5 +1,4 @@
 import { characterModel, contextModel, gameModel } from './database';
-import { logger } from './logger';
 import {
   addAssistantContext,
   addSystemContext,
@@ -13,14 +12,12 @@ import {
   getSummaryForImageGeneration,
 } from 'ai';
 import {
-  getDiceResultPrompt,
   getUsedLanguagePrompt,
   gmPrompt,
   markdownRules,
   shortReplyPrompt,
 } from 'ai/prompts';
 import { type BotContext } from 'context';
-import { d20 } from 'dice';
 import { InputMediaBuilder } from 'grammy';
 import { type Message, type Update } from 'grammy/types';
 import { locale } from 'locale';

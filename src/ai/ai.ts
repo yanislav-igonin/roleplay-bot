@@ -15,11 +15,6 @@ import { replaceNewLines } from 'strings';
 
 const configuration = new Configuration({
   apiKey: config.openAiApiKey,
-  // basePath: 'https://openrouter.ai/api/v1',
-  // baseOptions: {
-  //   headers: {
-
-  // }
 });
 export const openai = new OpenAIApi(configuration);
 
