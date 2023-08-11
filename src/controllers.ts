@@ -17,7 +17,6 @@ import {
   getUsedLanguagePrompt,
   gmPrompt,
   markdownRules,
-  rulesPrompt,
   shortReplyPrompt,
 } from 'ai/prompts';
 import { type BotContext } from 'context';
@@ -165,7 +164,6 @@ export const reply = async (botContext: BotContext) => {
   );
   preparedMessages.unshift(addSystemContext(markdownRules));
   preparedMessages.unshift(addSystemContext(shortReplyPrompt));
-  preparedMessages.unshift(addSystemContext(rulesPrompt));
   preparedMessages.unshift(addSystemContext(gmPrompt));
 
   await botContext.reply(locale.ru.replies.diceRoll);

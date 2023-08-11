@@ -12,13 +12,6 @@ export const gmPrompt =
   If a creature decides to attack my character, you may generate an attack roll for them. If the roll meets or exceeds my own AC, then the attack is successful and you can now generate a damage roll. That damage roll will be subtracted from my own hp. If the hp of a creature reaches 0, that creature dies. Participants in combat are unable to take actions outside of their own turn.
   Before we begin playing, I would like you to provide my three adventure options. Each should be a short description of the kind of adventure we will play, and what the tone of the adventure will be. Once I decide on the adventure, you may provide a brief setting description and begin the game. I would also like an opportunity to provide the details of my character for your reference, specifically my class, race, AC, and HP.`;
 
-export const rulesPrompt =
-  'Rules is simple: each time players try to do something game master ' +
-  'they should roll a d20 dice for this action.\n' +
-  'Every result equals or higher than 10 is a success.\n' +
-  '1 and 20 are critical fails and critical successes respectively. ' +
-  'They should produce a more interesting result.';
-
 export const markdownRules =
   `Text should be formatted in Markdown. ` +
   `You can use ONLY the following formatting without any exceptions:` +
