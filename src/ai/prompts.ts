@@ -84,9 +84,6 @@ export const getFirstContextPrompt = (
 export const getTranslateToEnglishPrompt = (text: string) =>
   `Translate the following text to English:\n\n${text}`;
 
-export const getDiceResultPrompt = (diceResult: number) =>
-  `You rolled a ${diceResult}.\n`;
-
 export const getUsedLanguagePrompt = (language = 'Russian') =>
   `All output always MUST be translated in ${language} language if its not in it.\n`;
 

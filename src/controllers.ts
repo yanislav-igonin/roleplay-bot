@@ -166,14 +166,8 @@ export const reply = async (botContext: BotContext) => {
   preparedMessages.unshift(addSystemContext(shortReplyPrompt));
   preparedMessages.unshift(addSystemContext(gmPrompt));
 
-  await botContext.reply(locale.ru.replies.diceRoll);
-  const diceResult = d20();
-  await botContext.reply(`${locale.ru.replies.diceResult}${diceResult}`);
-  const diceResultText = getDiceResultPrompt(diceResult);
-
   await botContext.replyWithChatAction('typing');
 
-  const fullUserMessageText = messageText + `\n\n` + diceResultText;
   await contextModel.create({
     data: {
       characterId: firstCharacter.id,
@@ -183,7 +177,7 @@ export const reply = async (botContext: BotContext) => {
       text: messageText as string,
     },
   });
-  const userMessage = addUserContext(fullUserMessageText);
+  const userMessage = addUserContext(messageText as string);
   preparedMessages.push(userMessage);
   preparedMessages.push(addSystemContext(getUsedLanguagePrompt()));
 
