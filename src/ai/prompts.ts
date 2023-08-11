@@ -41,7 +41,7 @@ export const getNewCharacterPrompt = (
   `${markdownRules}` +
   `Describe a character's appearance, race (based on any provided in the game ` +
   `description, or invent your own, but it should fit in the game world),` +
-  `personality, background, etc.\n` +
+  `personality, background, class, race, AC, and HP, etc.\n` +
   `Be creative, you can create not only the basic fantasy races like dwarfes, ghnomes, elves, humans, ` +
   `but also other different races like goblins, centaur, trolls, orcs, etc. BE CREATIVE.\n` +
   `Character can have some items, skills, spells, etc.\n` +
