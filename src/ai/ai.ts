@@ -9,20 +9,21 @@ import {
 import { config } from '@/config';
 import { JsonParseError } from 'error';
 import { locale } from 'locale';
-import { type ChatCompletionRequestMessage } from 'openai';
-import { Configuration, OpenAIApi } from 'openai';
+import OpenAI from 'openai';
 import { replaceNewLines } from 'strings';
 
-const configuration = new Configuration({
-  apiKey: config.openAiApiKey,
+
+export const openai = new OpenAI({
+  apiKey: config.openAiApiKey
 });
-export const openai = new OpenAIApi(configuration);
+
+type ChatCompletionRequestMessage = OpenAI.Chat.Completions.CreateChatCompletionRequestMessage
 
 export const addSystemContext = (text: string) => {
   return {
     content: text,
     role: 'system',
-  } as ChatCompletionRequestMessage;
+  } as OpenAI.Chat.Completions.CreateChatCompletionRequestMessage;
 };
 
 export const addAssistantContext = (text: string) => {
@@ -41,13 +42,13 @@ export const addUserContext = (text: string) => {
 
 export const getNewGame = async () => {
   const message = addUserContext(getNewGamePrompt());
-  const response = await openai.createChatCompletion({
+  const response = await openai.chat.completions.create({
     messages: [message],
     model: 'gpt-4',
     temperature: 0.7,
   });
 
-  const text = response.data.choices[0].message?.content;
+  const text = response.choices[0].message?.content;
   if (!text) {
     throw new Error(locale.ru.errors.noTextInResponse);
   }
@@ -63,13 +64,13 @@ export const getNewGame = async () => {
 
 export const getNewCharacter = async (gameDescription: string) => {
   const message = addUserContext(getNewCharacterPrompt(gameDescription));
-  const response = await openai.createChatCompletion({
+  const response = await openai.chat.completions.create({
     messages: [message],
     model: 'gpt-4',
     temperature: 0.7,
   });
 
-  const text = response.data.choices[0].message?.content;
+  const text = response.choices[0].message?.content;
   if (!text) {
     throw new Error(locale.ru.errors.noTextInResponse);
   }
@@ -85,12 +86,12 @@ export const getNewCharacter = async (gameDescription: string) => {
 
 const translateToEnglish = async (text: string) => {
   const message = addUserContext(getTranslateToEnglishPrompt(text));
-  const response = await openai.createChatCompletion({
+  const response = await openai.chat.completions.create({
     messages: [message],
     model: 'gpt-3.5-turbo',
   });
 
-  const textResponse = response.data.choices[0].message?.content;
+  const textResponse = response.choices[0].message?.content;
   if (!textResponse) {
     throw new Error(locale.ru.errors.noTextInResponse);
   }
@@ -100,12 +101,12 @@ const translateToEnglish = async (text: string) => {
 
 export const getSummaryForImageGeneration = async (text: string) => {
   const message = addUserContext(getSummaryForImageGenerationPrompt(text));
-  const response = await openai.createChatCompletion({
+  const response = await openai.chat.completions.create({
     messages: [message],
     model: 'gpt-3.5-turbo',
   });
 
-  const textResponse = response.data.choices[0].message?.content;
+  const textResponse = response.choices[0].message?.content;
   if (!textResponse) {
     throw new Error(locale.ru.errors.noTextInResponse);
   }
@@ -120,12 +121,12 @@ export const getSummaryForImageGeneration = async (text: string) => {
 export const getImage = async (text: string) => {
   const withStyling = `${text}\n\nStyle: Fantasy portrait or landscape\n\n`;
   const translatedText = await translateToEnglish(withStyling);
-  const response = await openai.createImage({
+  const response = await openai.images.generate({
     prompt: translatedText,
     response_format: 'url',
     size: '512x512',
   });
-  const { url } = response.data.data[0];
+  const { url } = response.data[0];
   if (!url) {
     throw new Error(locale.ru.errors.noImageUrlInResponse);
   }
@@ -140,13 +141,13 @@ export const getFirstContext = async (
   const message = addUserContext(
     getFirstContextPrompt(gameDescription, characterDescription),
   );
-  const response = await openai.createChatCompletion({
+  const response = await openai.chat.completions.create({
     messages: [message],
     model: 'gpt-4',
     temperature: 0.8,
   });
 
-  const textResponse = response.data.choices[0].message?.content;
+  const textResponse = response.choices[0].message?.content;
   if (!textResponse) {
     throw new Error(locale.ru.errors.noTextInResponse);
   }
@@ -156,12 +157,12 @@ export const getFirstContext = async (
 
 export const getContextSummary = async (context: string) => {
   const message = addUserContext(getContextSummaryPrompt(context));
-  const response = await openai.createChatCompletion({
+  const response = await openai.chat.completions.create({
     messages: [message],
     model: 'gpt-3.5-turbo',
   });
 
-  const summary = response.data.choices[0].message?.content;
+  const summary = response.choices[0].message?.content;
   if (!summary) {
     throw new Error('No text in response');
   }
@@ -173,12 +174,12 @@ export const getNextContext = async (
   messages = [] as ChatCompletionRequestMessage[],
   model = 'gpt-4',
 ) => {
-  const response = await openai.createChatCompletion({
+  const response = await openai.chat.completions.create({
     messages,
     model,
   });
 
-  const text = response.data.choices[0].message?.content;
+  const text = response.choices[0].message?.content;
   if (!text) {
     throw new Error('No text in response');
   }
