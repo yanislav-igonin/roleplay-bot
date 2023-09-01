@@ -84,105 +84,105 @@ export const getNewCharacter = async (gameDescription: string) => {
   }
 };
 
-const translateToEnglish = async (text: string) => {
-  const message = addUserContext(getTranslateToEnglishPrompt(text));
-  const response = await openai.chat.completions.create({
-    messages: [message],
-    model: 'gpt-3.5-turbo',
-  });
+// const translateToEnglish = async (text: string) => {
+//   const message = addUserContext(getTranslateToEnglishPrompt(text));
+//   const response = await openai.chat.completions.create({
+//     messages: [message],
+//     model: 'gpt-3.5-turbo',
+//   });
 
-  const textResponse = response.choices[0].message?.content;
-  if (!textResponse) {
-    throw new Error(locale.ru.errors.noTextInResponse);
-  }
+//   const textResponse = response.choices[0].message?.content;
+//   if (!textResponse) {
+//     throw new Error(locale.ru.errors.noTextInResponse);
+//   }
 
-  return textResponse;
-};
+//   return textResponse;
+// };
 
-export const getSummaryForImageGeneration = async (text: string) => {
-  const message = addUserContext(getSummaryForImageGenerationPrompt(text));
-  const response = await openai.chat.completions.create({
-    messages: [message],
-    model: 'gpt-3.5-turbo',
-  });
+// export const getSummaryForImageGeneration = async (text: string) => {
+//   const message = addUserContext(getSummaryForImageGenerationPrompt(text));
+//   const response = await openai.chat.completions.create({
+//     messages: [message],
+//     model: 'gpt-3.5-turbo',
+//   });
 
-  const textResponse = response.choices[0].message?.content;
-  if (!textResponse) {
-    throw new Error(locale.ru.errors.noTextInResponse);
-  }
+//   const textResponse = response.choices[0].message?.content;
+//   if (!textResponse) {
+//     throw new Error(locale.ru.errors.noTextInResponse);
+//   }
 
-  return textResponse;
-};
+//   return textResponse;
+// };
 
-/**
- * Generate an image based on text provided.
- * Useful to generate any kind of images for games views, characters portraits, etc.
- */
-export const getImage = async (text: string) => {
-  const withStyling = `${text}\n\nStyle: Fantasy portrait or landscape\n\n`;
-  const translatedText = await translateToEnglish(withStyling);
-  const response = await openai.images.generate({
-    prompt: translatedText,
-    response_format: 'url',
-    size: '512x512',
-  });
-  const { url } = response.data[0];
-  if (!url) {
-    throw new Error(locale.ru.errors.noImageUrlInResponse);
-  }
+// /**
+//  * Generate an image based on text provided.
+//  * Useful to generate any kind of images for games views, characters portraits, etc.
+//  */
+// export const getImage = async (text: string) => {
+//   const withStyling = `${text}\n\nStyle: Fantasy portrait or landscape\n\n`;
+//   const translatedText = await translateToEnglish(withStyling);
+//   const response = await openai.images.generate({
+//     prompt: translatedText,
+//     response_format: 'url',
+//     size: '512x512',
+//   });
+//   const { url } = response.data[0];
+//   if (!url) {
+//     throw new Error(locale.ru.errors.noImageUrlInResponse);
+//   }
 
-  return url;
-};
+//   return url;
+// };
 
-export const getFirstContext = async (
-  gameDescription: string,
-  characterDescription: string,
-) => {
-  const message = addUserContext(
-    getFirstContextPrompt(gameDescription, characterDescription),
-  );
-  const response = await openai.chat.completions.create({
-    messages: [message],
-    model: 'gpt-4',
-    temperature: 0.8,
-  });
+// export const getFirstContext = async (
+//   gameDescription: string,
+//   characterDescription: string,
+// ) => {
+//   const message = addUserContext(
+//     getFirstContextPrompt(gameDescription, characterDescription),
+//   );
+//   const response = await openai.chat.completions.create({
+//     messages: [message],
+//     model: 'gpt-4',
+//     temperature: 0.8,
+//   });
 
-  const textResponse = response.choices[0].message?.content;
-  if (!textResponse) {
-    throw new Error(locale.ru.errors.noTextInResponse);
-  }
+//   const textResponse = response.choices[0].message?.content;
+//   if (!textResponse) {
+//     throw new Error(locale.ru.errors.noTextInResponse);
+//   }
 
-  return textResponse;
-};
+//   return textResponse;
+// };
 
-export const getContextSummary = async (context: string) => {
-  const message = addUserContext(getContextSummaryPrompt(context));
-  const response = await openai.chat.completions.create({
-    messages: [message],
-    model: 'gpt-3.5-turbo',
-  });
+// export const getContextSummary = async (context: string) => {
+//   const message = addUserContext(getContextSummaryPrompt(context));
+//   const response = await openai.chat.completions.create({
+//     messages: [message],
+//     model: 'gpt-3.5-turbo',
+//   });
 
-  const summary = response.choices[0].message?.content;
-  if (!summary) {
-    throw new Error('No text in response');
-  }
+//   const summary = response.choices[0].message?.content;
+//   if (!summary) {
+//     throw new Error('No text in response');
+//   }
 
-  return summary;
-};
+//   return summary;
+// };
 
-export const getNextContext = async (
-  messages = [] as ChatCompletionRequestMessage[],
-  model = 'gpt-4',
-) => {
-  const response = await openai.chat.completions.create({
-    messages,
-    model,
-  });
+// export const getNextContext = async (
+//   messages = [] as ChatCompletionRequestMessage[],
+//   model = 'gpt-4',
+// ) => {
+//   const response = await openai.chat.completions.create({
+//     messages,
+//     model,
+//   });
 
-  const text = response.choices[0].message?.content;
-  if (!text) {
-    throw new Error('No text in response');
-  }
+//   const text = response.choices[0].message?.content;
+//   if (!text) {
+//     throw new Error('No text in response');
+//   }
 
-  return text;
-};
+//   return text;
+// };
