@@ -114,3 +114,5 @@ dist/
 
 # DB shit
 data/
+
+.DS_Store

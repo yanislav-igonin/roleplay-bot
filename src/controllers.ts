@@ -1,5 +1,4 @@
 import { characterModel, contextModel, gameModel } from './database';
-import { logger } from './logger';
 import {
   addAssistantContext,
   addSystemContext,
@@ -13,86 +12,132 @@ import {
   getSummaryForImageGeneration,
 } from 'ai';
 import {
-  getDiceResultPrompt,
+  characterGenerationPrompt,
   getUsedLanguagePrompt,
   gmPrompt,
+  initialPrompt,
   markdownRules,
-  rulesPrompt,
   shortReplyPrompt,
 } from 'ai/prompts';
 import { type BotContext } from 'context';
-import { d20 } from 'dice';
-import { InputMediaBuilder } from 'grammy';
+import { Context, InputMediaBuilder } from 'grammy';
 import { type Message, type Update } from 'grammy/types';
 import { locale } from 'locale';
+import { replaceNewLines } from 'strings';
 
 const getMessageUniqueId = (message: Message) =>
   `${message.chat.id.toString()}_${message.message_id.toString()}`;
 
-export const startNewGame = async (context: BotContext) => {
-  const { user } = context.state;
-
+export const startNewGame = async (context: Context) => {
   await context.reply(locale.ru.replies.startingNewGame);
   await context.replyWithChatAction('typing');
+  const characterRes = await getNextContext([
+    addSystemContext(characterGenerationPrompt),
+  ]);
+  const normalized = replaceNewLines(characterRes);
+  const character = JSON.parse(normalized) as {
+    name: string;
+    description: string;
+    backstory: string;
+    race: string;
+    class: string;
+    alignment: string;
+    attributes: {
+      str: number;
+      dex: number;
+      con: number;
+      int: number;
+      wis: number;
+      cha: number;
+    };
+  };
 
-  const { description: gameDescription, name: gameName } = await getNewGame();
-  const game = await gameModel.create({
-    data: {
-      createdByUserId: user.id,
-      description: gameDescription,
-      name: gameName,
-    },
-  });
-  const summarizedGameDescription = await getSummaryForImageGeneration(
-    gameDescription
-  );
-  const gamePictureUrl = await getImage(summarizedGameDescription);
+  const text = `
+    *Персонаж*
+    
+    ${character.name}, ${character.race}, ${character.class}, ${character.alignment}
 
-  const { name: characterName, description: characterDescription } =
-    await getNewCharacter(gameDescription);
-  const character = await characterModel.create({
-    data: {
-      description: characterDescription,
-      gameId: game.id,
-      name: characterName,
-      userId: user.id,
-    },
-  });
-  const summarizedCharacterDescription = await getSummaryForImageGeneration(
-    characterDescription
-  );
-  const characterPictureUrl = await getImage(summarizedCharacterDescription);
-
-  const gamePictureMediaGroup = InputMediaBuilder.photo(gamePictureUrl, {
-    caption: `*${gameName}*\n\n${gameDescription}`,
+    ${character.description}
+    
+    ${character.backstory}
+    
+    *Атрибуты*
+    Strength: ${character.attributes.str}
+    Dexterity: ${character.attributes.dex}
+    Constitution: ${character.attributes.con}
+    Intelligence: ${character.attributes.int}
+    Wisdom: ${character.attributes.wis}
+    Charisma: ${character.attributes.cha}
+    `;
+  await context.reply(text, {
     parse_mode: 'Markdown',
-  });
-  const questMessage = await context.replyWithMediaGroup([gamePictureMediaGroup]);
-
-  const characterPictureMediaGroup = InputMediaBuilder.photo(characterPictureUrl, {
-    caption: `*Персонаж*\n\n${character.name}\n\n${character.description}`,
-    parse_mode: 'Markdown',
-  });
-  await context.replyWithMediaGroup([characterPictureMediaGroup], {
-    reply_to_message_id: questMessage[0].message_id,
-  });
-
-  const firstContext = await getFirstContext(gameDescription, characterDescription);
-  const withBeginning = `${locale.ru.replies.ourQuestBegins}\n\n${firstContext}`;
-  const firstContextMessage = await context.reply(withBeginning, {
-    parse_mode: 'Markdown',
-    reply_to_message_id: questMessage[0].message_id,
-  });
-  const firstContextSummary = await getContextSummary(firstContext);
-  await contextModel.create({
-    data: {
-      gameId: game.id,
-      summary: firstContextSummary,
-      telegramId: getMessageUniqueId(firstContextMessage),
-      text: firstContext,
-    },
   });
 };
+
+// export const startNewGame = async (context: BotContext) => {
+//   const { user } = context.state;
+
+//   await context.reply(locale.ru.replies.startingNewGame);
+//   await context.replyWithChatAction('typing');
+
+//   const { description: gameDescription, name: gameName } = await getNewGame();
+//   const game = await gameModel.create({
+//     data: {
+//       createdByUserId: user.id,
+//       description: gameDescription,
+//       name: gameName,
+//     },
+//   });
+//   const summarizedGameDescription = await getSummaryForImageGeneration(
+//     gameDescription
+//   );
+//   const gamePictureUrl = await getImage(summarizedGameDescription);
+
+//   const { name: characterName, description: characterDescription } =
+//     await getNewCharacter(gameDescription);
+//   const character = await characterModel.create({
+//     data: {
+//       description: characterDescription,
+//       gameId: game.id,
+//       name: characterName,
+//       userId: user.id,
+//     },
+//   });
+//   const summarizedCharacterDescription = await getSummaryForImageGeneration(
+//     characterDescription
+//   );
+//   const characterPictureUrl = await getImage(summarizedCharacterDescription);
+
+//   const gamePictureMediaGroup = InputMediaBuilder.photo(gamePictureUrl, {
+//     caption: `*${gameName}*\n\n${gameDescription}`,
+//     parse_mode: 'Markdown',
+//   });
+//   const questMessage = await context.replyWithMediaGroup([gamePictureMediaGroup]);
+
+//   const characterPictureMediaGroup = InputMediaBuilder.photo(characterPictureUrl, {
+//     caption: `*Персонаж*\n\n${character.name}\n\n${character.description}`,
+//     parse_mode: 'Markdown',
+//   });
+//   await context.replyWithMediaGroup([characterPictureMediaGroup], {
+//     reply_to_message_id: questMessage[0].message_id,
+//   });
+
+//   const firstContext = await getFirstContext(gameDescription, characterDescription);
+//   const withBeginning = `${locale.ru.replies.ourQuestBegins}\n\n${firstContext}`;
+//   const firstContextMessage = await context.reply(withBeginning, {
+//     parse_mode: 'Markdown',
+//     reply_to_message_id: questMessage[0].message_id,
+//   });
+//   const firstContextSummary = await getContextSummary(firstContext);
+//   await contextModel.create({
+//     data: {
+//       gameId: game.id,
+//       summary: firstContextSummary,
+//       telegramId: getMessageUniqueId(firstContextMessage),
+//       text: firstContext,
+//     },
+//   });
+// };
 
 export const reply = async (botContext: BotContext) => {
   const {
@@ -165,17 +210,10 @@ export const reply = async (botContext: BotContext) => {
   );
   preparedMessages.unshift(addSystemContext(markdownRules));
   preparedMessages.unshift(addSystemContext(shortReplyPrompt));
-  preparedMessages.unshift(addSystemContext(rulesPrompt));
   preparedMessages.unshift(addSystemContext(gmPrompt));
-
-  await botContext.reply(locale.ru.replies.diceRoll);
-  const diceResult = d20();
-  await botContext.reply(`${locale.ru.replies.diceResult}${diceResult}`);
-  const diceResultText = getDiceResultPrompt(diceResult);
 
   await botContext.replyWithChatAction('typing');
 
-  const fullUserMessageText = messageText + `\n\n` + diceResultText;
   await contextModel.create({
     data: {
       characterId: firstCharacter.id,
@@ -185,7 +223,7 @@ export const reply = async (botContext: BotContext) => {
       text: messageText as string,
     },
   });
-  const userMessage = addUserContext(fullUserMessageText);
+  const userMessage = addUserContext(messageText as string);
   preparedMessages.push(userMessage);
   preparedMessages.push(addSystemContext(getUsedLanguagePrompt()));
 

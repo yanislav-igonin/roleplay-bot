@@ -1,0 +1,1 @@
+export const replaceNewLines = (str: string) => str.replace(/\n/g, '\n')

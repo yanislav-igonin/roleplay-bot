@@ -11,14 +11,10 @@ import { JsonParseError } from 'error';
 import { locale } from 'locale';
 import { type ChatCompletionRequestMessage } from 'openai';
 import { Configuration, OpenAIApi } from 'openai';
+import { replaceNewLines } from 'strings';
 
 const configuration = new Configuration({
   apiKey: config.openAiApiKey,
-  // basePath: 'https://openrouter.ai/api/v1',
-  // baseOptions: {
-  //   headers: {
-
-  // }
 });
 export const openai = new OpenAIApi(configuration);
 
@@ -57,7 +53,8 @@ export const getNewGame = async () => {
   }
 
   try {
-    const parsed = JSON.parse(text) as { description: string; name: string };
+    const replaced = replaceNewLines(text);
+    const parsed = JSON.parse(replaced) as { description: string; name: string };
     return parsed;
   } catch {
     throw new JsonParseError('parsing new game data error', text);
@@ -78,7 +75,8 @@ export const getNewCharacter = async (gameDescription: string) => {
   }
 
   try {
-    const parsed = JSON.parse(text) as { description: string; name: string };
+    const replaced = replaceNewLines(text);
+    const parsed = JSON.parse(replaced) as { description: string; name: string };
     return parsed;
   } catch {
     throw new JsonParseError('parsing new character data error', text);
