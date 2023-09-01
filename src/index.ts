@@ -14,7 +14,6 @@ import { Bot } from 'grammy';
 import { locale } from 'locale';
 
 const menus = {
-  // @ts-expect-error Argument of type is not assignable to parameter of type
   start: new Menu('start').text(locale.ru.buttons.newGame, startNewGame),
 };
 
