@@ -7,6 +7,5 @@ export const {
   user: userModel,
   context: contextModel,
   game: gameModel,
-  item: itemModel,
   character: characterModel,
 } = database;
