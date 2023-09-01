@@ -28,9 +28,46 @@ import { replaceNewLines } from 'strings';
 const getMessageUniqueId = (message: Message) =>
   `${message.chat.id.toString()}_${message.message_id.toString()}`;
 
+const generateGame = async (userId: number) => {
+  const { description: gameDescription, name: gameName } = await getNewGame();
+  const game = await gameModel.create({
+    data: {
+      description: gameDescription,
+      name: gameName,
+      createdByUserId: userId,
+    },
+  });
+  return { game };
+};
+
+type GenerateCharacterData = {
+  userId: number;
+  gameId: number;
+  gameDescription: string;
+};
+const generateCharacter = async (data: GenerateCharacterData) => {
+  const { gameDescription, gameId, userId } = data;
+  const { description: characterDescription, name: characterName } =
+    await getNewCharacter(gameDescription);
+  const character = await characterModel.create({
+    data: {
+      description: characterDescription,
+      gameId,
+      name: characterName,
+      userId,
+    },
+  });
+  return { character };
+};
+
 export const startNewGame = async (context: Context) => {
   await context.reply(locale.ru.replies.startingNewGame);
   await context.replyWithChatAction('typing');
+
+  // generate game
+  // generate character
+  // ask for joins
+
   const characterRes = await getNextContext([
     addSystemContext(characterGenerationPrompt),
   ]);
@@ -42,6 +79,7 @@ export const startNewGame = async (context: Context) => {
     race: string;
     class: string;
     alignment: string;
+    level: number;
     attributes: {
       str: number;
       dex: number;
@@ -139,107 +177,107 @@ export const startNewGame = async (context: Context) => {
 //   });
 // };
 
-export const reply = async (botContext: BotContext) => {
-  const {
-    message_id: messageId,
-    reply_to_message: messageRepliedOn,
-    text: messageText,
-  } = botContext.message as Message & Update.NonChannel;
-  const botId = botContext.me.id;
+// export const reply = async (botContext: BotContext) => {
+//   const {
+//     message_id: messageId,
+//     reply_to_message: messageRepliedOn,
+//     text: messageText,
+//   } = botContext.message as Message & Update.NonChannel;
+//   const botId = botContext.me.id;
 
-  const notReply = messageRepliedOn === undefined;
-  const repliedOnBotsMessage = messageRepliedOn?.from?.id === botId;
-  const repliedOnOthersMessage = !repliedOnBotsMessage;
+//   const notReply = messageRepliedOn === undefined;
+//   const repliedOnBotsMessage = messageRepliedOn?.from?.id === botId;
+//   const repliedOnOthersMessage = !repliedOnBotsMessage;
 
-  if (notReply) {
-    // Do not do anything if message is not a reply
-    return;
-  }
+//   if (notReply) {
+//     // Do not do anything if message is not a reply
+//     return;
+//   }
 
-  if (repliedOnOthersMessage) {
-    // Do not do anything if message is a reply to a message from another user
-    return;
-  }
+//   if (repliedOnOthersMessage) {
+//     // Do not do anything if message is a reply to a message from another user
+//     return;
+//   }
 
-  const previousContext = await contextModel.findUnique({
-    where: { telegramId: getMessageUniqueId(messageRepliedOn) },
-  });
-  if (!previousContext) {
-    // If we replied on a message that is not a context message
-    // TODO: add a reply that this message is not a context message or something like that
-    throw new Error(locale.ru.errors.somethingWentWrong);
-  }
+//   const previousContext = await contextModel.findUnique({
+//     where: { telegramId: getMessageUniqueId(messageRepliedOn) },
+//   });
+//   if (!previousContext) {
+//     // If we replied on a message that is not a context message
+//     // TODO: add a reply that this message is not a context message or something like that
+//     throw new Error(locale.ru.errors.somethingWentWrong);
+//   }
 
-  const game = await gameModel.findUnique({
-    where: { id: previousContext.gameId },
-  });
-  if (!game) {
-    // Thats strange shit, 99% just a typecheck
-    // TODO: add a reply that this message is game message or something like that
-    throw new Error(locale.ru.errors.somethingWentWrong);
-  }
+//   const game = await gameModel.findUnique({
+//     where: { id: previousContext.gameId },
+//   });
+//   if (!game) {
+//     // Thats strange shit, 99% just a typecheck
+//     // TODO: add a reply that this message is game message or something like that
+//     throw new Error(locale.ru.errors.somethingWentWrong);
+//   }
 
-  // Now we'll take each time the same created character to simplify the game
-  // TODO: make different characters for different users
-  const firstCharacter = await characterModel.findFirst({
-    where: { gameId: game.id },
-  });
-  if (!firstCharacter) {
-    // Thats strange shit, 99% just a typecheck
-    // TODO: add a reply that this message is game message or something like that
-    throw new Error(locale.ru.errors.somethingWentWrong);
-  }
+//   // Now we'll take each time the same created character to simplify the game
+//   // TODO: make different characters for different users
+//   const firstCharacter = await characterModel.findFirst({
+//     where: { gameId: game.id },
+//   });
+//   if (!firstCharacter) {
+//     // Thats strange shit, 99% just a typecheck
+//     // TODO: add a reply that this message is game message or something like that
+//     throw new Error(locale.ru.errors.somethingWentWrong);
+//   }
 
-  const allContexts = await contextModel.findMany({
-    orderBy: { createdAt: 'asc' },
-    where: { gameId: game.id },
-  });
+//   const allContexts = await contextModel.findMany({
+//     orderBy: { createdAt: 'asc' },
+//     where: { gameId: game.id },
+//   });
 
-  const preparedMessages = allContexts.map(({ summary, text, characterId }) => {
-    const toAdd = summary ? summary : text;
-    if (characterId) return addUserContext(toAdd);
-    return addAssistantContext(toAdd);
-  });
+//   const preparedMessages = allContexts.map(({ summary, text, characterId }) => {
+//     const toAdd = summary ? summary : text;
+//     if (characterId) return addUserContext(toAdd);
+//     return addAssistantContext(toAdd);
+//   });
 
-  preparedMessages.unshift(addSystemContext(getUsedLanguagePrompt()));
-  preparedMessages.unshift(
-    addSystemContext(`Character description:\n\n${firstCharacter.description}`)
-  );
-  preparedMessages.unshift(
-    addSystemContext(`Game description:\n\n${game.description}`)
-  );
-  preparedMessages.unshift(addSystemContext(markdownRules));
-  preparedMessages.unshift(addSystemContext(shortReplyPrompt));
-  preparedMessages.unshift(addSystemContext(gmPrompt));
+//   preparedMessages.unshift(addSystemContext(getUsedLanguagePrompt()));
+//   preparedMessages.unshift(
+//     addSystemContext(`Character description:\n\n${firstCharacter.description}`)
+//   );
+//   preparedMessages.unshift(
+//     addSystemContext(`Game description:\n\n${game.description}`)
+//   );
+//   preparedMessages.unshift(addSystemContext(markdownRules));
+//   preparedMessages.unshift(addSystemContext(shortReplyPrompt));
+//   preparedMessages.unshift(addSystemContext(gmPrompt));
 
-  await botContext.replyWithChatAction('typing');
+//   await botContext.replyWithChatAction('typing');
 
-  await contextModel.create({
-    data: {
-      characterId: firstCharacter.id,
-      gameId: game.id,
-      summary: messageText,
-      telegramId: getMessageUniqueId(botContext.message!),
-      text: messageText as string,
-    },
-  });
-  const userMessage = addUserContext(messageText as string);
-  preparedMessages.push(userMessage);
-  preparedMessages.push(addSystemContext(getUsedLanguagePrompt()));
+//   await contextModel.create({
+//     data: {
+//       characterId: firstCharacter.id,
+//       gameId: game.id,
+//       summary: messageText,
+//       telegramId: getMessageUniqueId(botContext.message!),
+//       text: messageText as string,
+//     },
+//   });
+//   const userMessage = addUserContext(messageText as string);
+//   preparedMessages.push(userMessage);
+//   preparedMessages.push(addSystemContext(getUsedLanguagePrompt()));
 
-  const nextContext = await getNextContext(preparedMessages);
-  const nextContextSummary = await getContextSummary(nextContext);
+//   const nextContext = await getNextContext(preparedMessages);
+//   const nextContextSummary = await getContextSummary(nextContext);
 
-  const newTelegramMessage = await botContext.reply(nextContext, {
-    parse_mode: 'Markdown',
-    reply_to_message_id: messageRepliedOn.message_id,
-  });
-  await contextModel.create({
-    data: {
-      gameId: game.id,
-      summary: nextContextSummary,
-      telegramId: getMessageUniqueId(newTelegramMessage),
-      text: nextContext,
-    },
-  });
-};
+//   const newTelegramMessage = await botContext.reply(nextContext, {
+//     parse_mode: 'Markdown',
+//     reply_to_message_id: messageRepliedOn.message_id,
+//   });
+//   await contextModel.create({
+//     data: {
+//       gameId: game.id,
+//       summary: nextContextSummary,
+//       telegramId: getMessageUniqueId(newTelegramMessage),
+//       text: nextContext,
+//     },
+//   });
+// };
