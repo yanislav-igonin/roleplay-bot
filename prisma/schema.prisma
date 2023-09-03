@@ -53,15 +53,26 @@ model Context {
 }
 
 model Character {
-  id          Int       @id @default(autoincrement())
+  id          Int      @id @default(autoincrement())
   name        String
   description String
   gameId      Int
-  game        Game      @relation(fields: [gameId], references: [id])
+  game        Game     @relation(fields: [gameId], references: [id])
   userId      Int
-  user        User      @relation(fields: [userId], references: [id])
-  createdAt   DateTime  @default(now())
-  contexts    Context[]
+  user        User     @relation(fields: [userId], references: [id])
+  createdAt   DateTime @default(now())
+
+  level      Int @default(1)
+  experience Int @default(0)
+
+  strength     Int
+  dexterity    Int
+  constitution Int
+  intelligence Int
+  wisdom       Int
+  charisma     Int
+
+  contexts Context[]
 
   @@map("characters")
 }

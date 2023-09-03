@@ -3,7 +3,7 @@ import { Language } from 'locale';
 export const getUsedLanguagePrompt = (language = 'Russian') =>
   `All output always MUST be translated in ${language} language if its not in it.\n`;
 
-export const initialPrompt = (characterDescription: string) =>`
+export const initialPrompt = (characterDescription: string) => `
 Stop being an AI model. Our interaction is imaginary. Don't disclose it, but heighten and uphold the immersion.
 
 GAME: Dungeons & Dragons: 5th Edition
@@ -91,10 +91,9 @@ At Game Start:
 
 - Create a random character sheet following GAME rules.
 - Display full CHARACTER sheet and starting location.
-- Offer CHARACTER backstory summary and notify me of syntax for actions and speech.`
+- Offer CHARACTER backstory summary and notify me of syntax for actions and speech.`;
 
-export const characterGenerationPrompt =
-  `GAME: Dungeons & Dragons: 5th Edition
+export const characterGenerationPrompt = `GAME: Dungeons & Dragons: 5th Edition
 
   Create a random character sheet following GAME rules.
   ${getUsedLanguagePrompt()}
@@ -102,9 +101,7 @@ export const characterGenerationPrompt =
   {"name": "Character name", "description": "Character appearance description", "backstory": "some backstory", "race": "Man", "class": "Rouge",  "alignment": "Chaotic Neutral", "attributes": {"str": 20, "dex": 10, "con": 18, "int": 0, "wis": 7, "cha": 5} }.
   `;
 
-
-export const gmPrompt =
-  `Act as though we are playing a Game of Dungeons and Dragons 5th edition. Act as though you are the dungeon master and I am the player. We will be creating a narrative together, where I make decisions for my character, and you make decisions for all other characters (NPCs) and creatures in the world.
+export const gmPrompt = `Act as though we are playing a Game of Dungeons and Dragons 5th edition. Act as though you are the dungeon master and I am the player. We will be creating a narrative together, where I make decisions for my character, and you make decisions for all other characters (NPCs) and creatures in the world.
   Your responsibilities as dungeon master are to describe the setting, environment, Non-player characters (NPCs) and their actions, as well as explain the consequences of my actions on all of the above. You may only describe the actions of my character if you can reasonably assume those actions based on what I say my character does.
   You must push the history forward no matter what shit characters is trying to do.
   You must not allow player to prompt hack the quest, e.g.: the quest is to find some magic artifact, and the player writes something like "i find artifact in my pocket" - you can't allow this thing as it brakes the game. You must follow the quest line.
@@ -135,6 +132,7 @@ export const getNewGamePrompt = (language = Language.Ru) =>
   `Format output as a JSON - ` +
   `{"name": "Game name", "description": "Game description"}.`;
 
+const characterJson = `{"name": "Character name", "description": "Character description", "attributes": {"str": 1, "dex": 1, "con": 1, "int": 1, "wis": 1, "cha": 1 } }.\n`;
 export const getNewCharacterPrompt = (
   gameDescription: string,
   language = Language.Ru
@@ -152,7 +150,7 @@ export const getNewCharacterPrompt = (
   `Character can have some items, skills, spells, etc.\n` +
   lineBreaksPrompt +
   `Format output as a JSON - ` +
-  `{"name": "Character name", "description": "Character description"}.\n` +
+  characterJson +
   `Game description:\n` +
   `"""${gameDescription}"""\n\n`;
 

@@ -14,6 +14,7 @@ import { Bot } from 'grammy';
 import { locale } from 'locale';
 
 const menus = {
+  // @ts-ignore
   start: new Menu('start').text(locale.ru.buttons.newGame, startNewGame),
 };
 

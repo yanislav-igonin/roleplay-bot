@@ -12,12 +12,12 @@ import { locale } from 'locale';
 import OpenAI from 'openai';
 import { replaceNewLines } from 'strings';
 
-
 export const openai = new OpenAI({
-  apiKey: config.openAiApiKey
+  apiKey: config.openAiApiKey,
 });
 
-type ChatCompletionRequestMessage = OpenAI.Chat.Completions.CreateChatCompletionRequestMessage
+type ChatCompletionRequestMessage =
+  OpenAI.Chat.Completions.CreateChatCompletionRequestMessage;
 
 export const addSystemContext = (text: string) => {
   return {
@@ -77,7 +77,18 @@ export const getNewCharacter = async (gameDescription: string) => {
 
   try {
     const replaced = replaceNewLines(text);
-    const parsed = JSON.parse(replaced) as { description: string; name: string };
+    const parsed = JSON.parse(replaced) as {
+      name: string;
+      description: string;
+      attributes: {
+        str: number;
+        dex: number;
+        con: number;
+        int: number;
+        wis: number;
+        cha: number;
+      };
+    };
     return parsed;
   } catch {
     throw new JsonParseError('parsing new character data error', text);

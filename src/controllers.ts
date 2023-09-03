@@ -3,13 +3,13 @@ import {
   addAssistantContext,
   addSystemContext,
   addUserContext,
-  getContextSummary,
-  getFirstContext,
-  getImage,
+  // getContextSummary,
+  // getFirstContext,
+  // getImage,
   getNewCharacter,
   getNewGame,
-  getNextContext,
-  getSummaryForImageGeneration,
+  // getNextContext,
+  // getSummaryForImageGeneration,
 } from 'ai';
 import {
   characterGenerationPrompt,
@@ -37,7 +37,7 @@ const generateGame = async (userId: number) => {
       createdByUserId: userId,
     },
   });
-  return { game };
+  return game;
 };
 
 type GenerateCharacterData = {
@@ -47,20 +47,33 @@ type GenerateCharacterData = {
 };
 const generateCharacter = async (data: GenerateCharacterData) => {
   const { gameDescription, gameId, userId } = data;
-  const { description: characterDescription, name: characterName } =
-    await getNewCharacter(gameDescription);
+  const {
+    description: characterDescription,
+    name: characterName,
+    attributes: { cha, con, dex, int, str, wis },
+  } = await getNewCharacter(gameDescription);
   const character = await characterModel.create({
     data: {
       description: characterDescription,
       gameId,
       name: characterName,
       userId,
+      strength: str,
+      dexterity: dex,
+      constitution: con,
+      intelligence: int,
+      wisdom: wis,
+      charisma: cha,
     },
   });
-  return { character };
+  return character;
 };
 
-export const startNewGame = async (context: Context) => {
+const getGameReplyText = (game: gameModel) => {
+
+export const startNewGame = async (context: BotContext) => {
+  const userId = context.state.user.id;
+
   await context.reply(locale.ru.replies.startingNewGame);
   await context.replyWithChatAction('typing');
 
@@ -68,44 +81,32 @@ export const startNewGame = async (context: Context) => {
   // generate character
   // ask for joins
 
-  const characterRes = await getNextContext([
-    addSystemContext(characterGenerationPrompt),
-  ]);
-  const normalized = replaceNewLines(characterRes);
-  const character = JSON.parse(normalized) as {
-    name: string;
-    description: string;
-    backstory: string;
-    race: string;
-    class: string;
-    alignment: string;
-    level: number;
-    attributes: {
-      str: number;
-      dex: number;
-      con: number;
-      int: number;
-      wis: number;
-      cha: number;
-    };
-  };
+  const game = await generateGame(userId);
+
+  await context.reply(text, {
+    parse_mode: 'Markdown',
+  });
+
+  const character = await generateCharacter({
+    gameDescription: game.description,
+    gameId: game.id,
+    userId,
+  });
 
   const text = `
     *Персонаж*
     
-    ${character.name}, ${character.race}, ${character.class}, ${character.alignment}
+    ${character.name}
 
     ${character.description}
     
-    ${character.backstory}
-    
     *Атрибуты*
-    Strength: ${character.attributes.str}
-    Dexterity: ${character.attributes.dex}
-    Constitution: ${character.attributes.con}
-    Intelligence: ${character.attributes.int}
-    Wisdom: ${character.attributes.wis}
-    Charisma: ${character.attributes.cha}
+    Сила: ${character.strength}
+    Ловкость: ${character.dexterity}
+    Выносливаость: ${character.constitution}
+    Интеллект: ${character.intelligence}
+    Мудрость: ${character.wisdom}
+    Харизма: ${character.charisma}
     `;
   await context.reply(text, {
     parse_mode: 'Markdown',
