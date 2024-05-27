@@ -43,7 +43,7 @@ export const getNewGame = async () => {
   const message = addUserContext(getNewGamePrompt());
   const response = await openai.createChatCompletion({
     messages: [message],
-    model: 'gpt-4',
+    model: 'gpt-4o',
     temperature: 0.7,
   });
 
@@ -54,7 +54,10 @@ export const getNewGame = async () => {
 
   try {
     const replaced = replaceNewLines(text);
-    const parsed = JSON.parse(replaced) as { description: string; name: string };
+    const parsed = JSON.parse(replaced) as {
+      description: string;
+      name: string;
+    };
     return parsed;
   } catch {
     throw new JsonParseError('parsing new game data error', text);
@@ -65,7 +68,7 @@ export const getNewCharacter = async (gameDescription: string) => {
   const message = addUserContext(getNewCharacterPrompt(gameDescription));
   const response = await openai.createChatCompletion({
     messages: [message],
-    model: 'gpt-4',
+    model: 'gpt-4o',
     temperature: 0.7,
   });
 
@@ -76,7 +79,10 @@ export const getNewCharacter = async (gameDescription: string) => {
 
   try {
     const replaced = replaceNewLines(text);
-    const parsed = JSON.parse(replaced) as { description: string; name: string };
+    const parsed = JSON.parse(replaced) as {
+      description: string;
+      name: string;
+    };
     return parsed;
   } catch {
     throw new JsonParseError('parsing new character data error', text);
@@ -142,7 +148,7 @@ export const getFirstContext = async (
   );
   const response = await openai.createChatCompletion({
     messages: [message],
-    model: 'gpt-4',
+    model: 'gpt-4o',
     temperature: 0.8,
   });
 
@@ -171,7 +177,7 @@ export const getContextSummary = async (context: string) => {
 
 export const getNextContext = async (
   messages = [] as ChatCompletionRequestMessage[],
-  model = 'gpt-4',
+  model = 'gpt-4o',
 ) => {
   const response = await openai.createChatCompletion({
     messages,
