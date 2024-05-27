@@ -1,6 +1,6 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from "@prisma/client";
 
-export { type User } from '@prisma/client';
+export { type User } from "@prisma/client";
 
 export const database = new PrismaClient();
 export const {
@@ -9,3 +9,6 @@ export const {
   game: gameModel,
   character: characterModel,
 } = database;
+
+// random emojis selector
+export const emojis = ["🐶", "🐱", "🐭", "🐹", "🐰", "🦊", "🐻"];
