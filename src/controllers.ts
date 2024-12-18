@@ -20,7 +20,8 @@ import {
   shortReplyPrompt,
 } from 'ai/prompts';
 import { type BotContext } from 'context';
-import { Context, InputMediaBuilder } from 'grammy';
+import { type Context } from 'grammy';
+import { InputMediaBuilder } from 'grammy';
 import { type Message, type Update } from 'grammy/types';
 import { locale } from 'locale';
 import { replaceNewLines } from 'strings';
@@ -36,20 +37,20 @@ export const startNewGame = async (context: Context) => {
   ]);
   const normalized = replaceNewLines(characterRes);
   const character = JSON.parse(normalized) as {
-    name: string;
-    description: string;
-    backstory: string;
-    race: string;
-    class: string;
     alignment: string;
     attributes: {
-      str: number;
-      dex: number;
-      con: number;
-      int: number;
-      wis: number;
       cha: number;
+      con: number;
+      dex: number;
+      int: number;
+      str: number;
+      wis: number;
     };
+    backstory: string;
+    class: string;
+    description: string;
+    name: string;
+    race: string;
   };
 
   const text = `

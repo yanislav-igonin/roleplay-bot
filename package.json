@@ -39,7 +39,7 @@
     "@grammyjs/menu": "^1.2.1",
     "@prisma/client": "^4.11.0",
     "grammy": "^1.17.1",
-    "openai": "^3.3.0"
+    "openai": "^4.77.0"
   },
   "volta": {
     "node": "20.4.0"
