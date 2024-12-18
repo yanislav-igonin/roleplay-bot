@@ -29,116 +29,70 @@ import { replaceNewLines } from 'strings';
 const getMessageUniqueId = (message: Message) =>
   `${message.chat.id.toString()}_${message.message_id.toString()}`;
 
-export const startNewGame = async (context: Context) => {
+export const startNewGame = async (context: BotContext) => {
+  const { user } = context.state;
+
   await context.reply(locale.ru.replies.startingNewGame);
   await context.replyWithChatAction('typing');
-  const characterRes = await getNextContext([
-    addSystemContext(characterGenerationPrompt),
-  ]);
-  const normalized = replaceNewLines(characterRes);
-  const character = JSON.parse(normalized) as {
-    alignment: string;
-    attributes: {
-      cha: number;
-      con: number;
-      dex: number;
-      int: number;
-      str: number;
-      wis: number;
-    };
-    backstory: string;
-    class: string;
-    description: string;
-    name: string;
-    race: string;
-  };
 
-  const text = `
-    *Персонаж*
-    
-    ${character.name}, ${character.race}, ${character.class}, ${character.alignment}
+  const { description: gameDescription, name: gameName } = await getNewGame();
+  const game = await gameModel.create({
+    data: {
+      createdByUserId: user.id,
+      description: gameDescription,
+      name: gameName,
+    },
+  });
+  const summarizedGameDescription = await getSummaryForImageGeneration(
+    gameDescription
+  );
+  const gamePictureUrl = await getImage(summarizedGameDescription);
 
-    ${character.description}
-    
-    ${character.backstory}
-    
-    *Атрибуты*
-    Strength: ${character.attributes.str}
-    Dexterity: ${character.attributes.dex}
-    Constitution: ${character.attributes.con}
-    Intelligence: ${character.attributes.int}
-    Wisdom: ${character.attributes.wis}
-    Charisma: ${character.attributes.cha}
-    `;
-  await context.reply(text, {
+  const { name: characterName, description: characterDescription } =
+    await getNewCharacter(gameDescription);
+  const character = await characterModel.create({
+    data: {
+      description: characterDescription,
+      gameId: game.id,
+      name: characterName,
+      userId: user.id,
+    },
+  });
+  const summarizedCharacterDescription = await getSummaryForImageGeneration(
+    characterDescription
+  );
+  const characterPictureUrl = await getImage(summarizedCharacterDescription);
+
+  const gamePictureMediaGroup = InputMediaBuilder.photo(gamePictureUrl, {
+    caption: `*${gameName}*\n\n${gameDescription}`,
     parse_mode: 'Markdown',
   });
+  const questMessage = await context.replyWithMediaGroup([gamePictureMediaGroup]);
+
+  const characterPictureMediaGroup = InputMediaBuilder.photo(characterPictureUrl, {
+    caption: `*Персонаж*\n\n${character.name}\n\n${character.description}`,
+    parse_mode: 'Markdown',
+  });
+  await context.replyWithMediaGroup([characterPictureMediaGroup], {
+    reply_to_message_id: questMessage[0].message_id,
+  });
+
+  const firstContext = await getFirstContext(gameDescription, characterDescription);
+  const withBeginning = `${locale.ru.replies.ourQuestBegins}\n\n${firstContext}`;
+  const firstContextMessage = await context.reply(withBeginning, {
+    parse_mode: 'Markdown',
+    reply_to_message_id: questMessage[0].message_id,
+  });
+  const firstContextSummary = await getContextSummary(firstContext);
+  await contextModel.create({
+    data: {
+      gameId: game.id,
+      summary: firstContextSummary,
+      telegramId: getMessageUniqueId(firstContextMessage),
+      text: firstContext,
+    },
+  });
 };
-
-// export const startNewGame = async (context: BotContext) => {
-//   const { user } = context.state;
-
-//   await context.reply(locale.ru.replies.startingNewGame);
-//   await context.replyWithChatAction('typing');
-
-//   const { description: gameDescription, name: gameName } = await getNewGame();
-//   const game = await gameModel.create({
-//     data: {
-//       createdByUserId: user.id,
-//       description: gameDescription,
-//       name: gameName,
-//     },
-//   });
-//   const summarizedGameDescription = await getSummaryForImageGeneration(
-//     gameDescription
-//   );
-//   const gamePictureUrl = await getImage(summarizedGameDescription);
-
-//   const { name: characterName, description: characterDescription } =
-//     await getNewCharacter(gameDescription);
-//   const character = await characterModel.create({
-//     data: {
-//       description: characterDescription,
-//       gameId: game.id,
-//       name: characterName,
-//       userId: user.id,
-//     },
-//   });
-//   const summarizedCharacterDescription = await getSummaryForImageGeneration(
-//     characterDescription
-//   );
-//   const characterPictureUrl = await getImage(summarizedCharacterDescription);
-
-//   const gamePictureMediaGroup = InputMediaBuilder.photo(gamePictureUrl, {
-//     caption: `*${gameName}*\n\n${gameDescription}`,
-//     parse_mode: 'Markdown',
-//   });
-//   const questMessage = await context.replyWithMediaGroup([gamePictureMediaGroup]);
-
-//   const characterPictureMediaGroup = InputMediaBuilder.photo(characterPictureUrl, {
-//     caption: `*Персонаж*\n\n${character.name}\n\n${character.description}`,
-//     parse_mode: 'Markdown',
-//   });
-//   await context.replyWithMediaGroup([characterPictureMediaGroup], {
-//     reply_to_message_id: questMessage[0].message_id,
-//   });
-
-//   const firstContext = await getFirstContext(gameDescription, characterDescription);
-//   const withBeginning = `${locale.ru.replies.ourQuestBegins}\n\n${firstContext}`;
-//   const firstContextMessage = await context.reply(withBeginning, {
-//     parse_mode: 'Markdown',
-//     reply_to_message_id: questMessage[0].message_id,
-//   });
-//   const firstContextSummary = await getContextSummary(firstContext);
-//   await contextModel.create({
-//     data: {
-//       gameId: game.id,
-//       summary: firstContextSummary,
-//       telegramId: getMessageUniqueId(firstContextMessage),
-//       text: firstContext,
-//     },
-//   });
-// };
 
 export const reply = async (botContext: BotContext) => {
   const {
