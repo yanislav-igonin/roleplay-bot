@@ -9,11 +9,12 @@ import {
 } from '@/middlewares';
 import { Menu } from '@grammyjs/menu';
 import { type BotContext } from 'context';
-import { reply, startNewGame } from 'controllers';
+import { /* reply, */ startNewGame } from 'controllers';
 import { Bot } from 'grammy';
 import { locale } from 'locale';
 
 const menus = {
+  // @ts-expect-error Types mismatch
   start: new Menu('start').text(locale.ru.buttons.newGame, startNewGame),
 };
 
@@ -33,7 +34,7 @@ bot.command('help', async (context) => {
   await context.reply(locale.ru.replies.help);
 });
 
-bot.on('message:text', reply);
+// bot.on('message:text', reply);
 
 const start = async () => {
   await database.$connect();

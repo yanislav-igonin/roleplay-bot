@@ -12,11 +12,15 @@ import { locale } from 'locale';
 import { OpenAI } from 'openai';
 import { replaceNewLines } from 'strings';
 
+type ChatCompletionRequestMessage =
+  OpenAI.Chat.Completions.ChatCompletionMessageParam;
+
 export const openai = new OpenAI({
   apiKey: config.openAiApiKey,
 });
 export const grok = new OpenAI({
   apiKey: config.grokApiKey,
+  baseURL: 'https://api.x.ai/v1',
 });
 
 enum Models {
@@ -55,7 +59,7 @@ export const getNewGame = async () => {
     temperature: 0.7,
   });
 
-  const text = response.data.choices[0].message?.content;
+  const text = response.choices[0].message?.content;
   if (!text) {
     throw new Error(locale.ru.errors.noTextInResponse);
   }
@@ -80,7 +84,7 @@ export const getNewCharacter = async (gameDescription: string) => {
     temperature: 0.7,
   });
 
-  const text = response.data.choices[0].message?.content;
+  const text = response.choices[0].message?.content;
   if (!text) {
     throw new Error(locale.ru.errors.noTextInResponse);
   }
@@ -99,7 +103,7 @@ export const getNewCharacter = async (gameDescription: string) => {
 
 export const getSummaryForImageGeneration = async (text: string) => {
   const message = addUserContext(getSummaryForImageGenerationPrompt(text));
-  const response = await grok.chat.completions.create({
+  const response = await openai.chat.completions.create({
     messages: [message],
     model: Models.Gpt35Turbo,
   });
@@ -138,44 +142,44 @@ export const getImage = async (text: string) => {
     // size: '1792x1024',
     size: '512x512',
   });
-  return response.data[0].url;
+  return response.data[0].url as string;
 };
 
-// export const getFirstContext = async (
-//   gameDescription: string,
-//   characterDescription: string
-// ) => {
-//   const message = addUserContext(
-//     getFirstContextPrompt(gameDescription, characterDescription)
-//   );
-//   const response = await openai.createChatCompletion({
-//     messages: [message],
-//     model: 'gpt-4o',
-//     temperature: 0.8,
-//   });
+export const getFirstContext = async (
+  gameDescription: string,
+  characterDescription: string
+) => {
+  const message = addUserContext(
+    getFirstContextPrompt(gameDescription, characterDescription)
+  );
+  const response = await grok.chat.completions.create({
+    messages: [message],
+    model: Models.GrokBeta,
+    temperature: 0.8,
+  });
 
-//   const textResponse = response.data.choices[0].message?.content;
-//   if (!textResponse) {
-//     throw new Error(locale.ru.errors.noTextInResponse);
-//   }
+  const textResponse = response.choices[0].message?.content;
+  if (!textResponse) {
+    throw new Error(locale.ru.errors.noTextInResponse);
+  }
 
-//   return textResponse;
-// };
+  return textResponse;
+};
 
-// export const getContextSummary = async (context: string) => {
-//   const message = addUserContext(getContextSummaryPrompt(context));
-//   const response = await openai.createChatCompletion({
-//     messages: [message],
-//     model: 'gpt-3.5-turbo',
-//   });
+export const getContextSummary = async (context: string) => {
+  const message = addUserContext(getContextSummaryPrompt(context));
+  const response = await openai.chat.completions.create({
+    messages: [message],
+    model: Models.Gpt35Turbo,
+  });
 
-//   const summary = response.data.choices[0].message?.content;
-//   if (!summary) {
-//     throw new Error('No text in response');
-//   }
+  const textResponse = response.choices[0].message?.content;
+  if (!textResponse) {
+    throw new Error(locale.ru.errors.noTextInResponse);
+  }
 
-//   return summary;
-// };
+  return textResponse;
+};
 
 // export const getNextContext = async (
 //   messages = [] as ChatCompletionRequestMessage[],
