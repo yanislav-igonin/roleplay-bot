@@ -124,25 +124,12 @@ export const getSummaryForImageGeneration = async (text: string) => {
  */
 export const getImage = async (text: string) => {
   const withStyling = `${text}\n\nStyle: Fantasy portrait or landscape\n\n`;
-  // const translatedText = await translateToEnglish(withStyling);
-  // const response = await openai.images.generate({
-  //   prompt: withStyling,
-  //   response_format: 'url',
-  //   size: '512x512',
-  // });
-  // const { url } = response.choices[];
-  // if (!url) {
-  //   throw new Error(locale.ru.errors.noImageUrlInResponse);
-  // }
-
-  // return url;
-
   const response = await openai.images.generate({
     model: 'dall-e-3',
     prompt: withStyling,
+    quality: 'hd',
     response_format: 'url',
     size: '1792x1024',
-    // size: '512x512',
   });
   return response.data[0].url as string;
 };
