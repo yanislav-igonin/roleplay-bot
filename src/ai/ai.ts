@@ -4,7 +4,7 @@ import {
   getNewCharacterPrompt,
   getNewGamePrompt,
   getSummaryForImageGenerationPrompt,
-  getTranslateToEnglishPrompt,
+  // getTranslateToEnglishPrompt,
 } from './prompts';
 import { config } from '@/config';
 import { JsonParseError } from 'error';
@@ -170,19 +170,19 @@ export const getContextSummary = async (context: string) => {
   return textResponse;
 };
 
-// export const getNextContext = async (
-//   messages = [] as ChatCompletionRequestMessage[],
-//   model = 'gpt-4o'
-// ) => {
-//   const response = await openai.createChatCompletion({
-//     messages,
-//     model,
-//   });
+export const getNextContext = async (
+  messages = [] as ChatCompletionRequestMessage[],
+  model = Models.Grok2
+) => {
+  const response = await grok.chat.completions.create({
+    messages,
+    model,
+  });
 
-//   const text = response.data.choices[0].message?.content;
-//   if (!text) {
-//     throw new Error('No text in response');
-//   }
+  const textResponse = response.choices[0].message?.content;
+  if (!textResponse) {
+    throw new Error(locale.ru.errors.noTextInResponse);
+  }
 
-//   return text;
-// };
+  return textResponse;
+};
