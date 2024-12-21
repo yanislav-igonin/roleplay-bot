@@ -52,17 +52,17 @@ model Context {
   @@map("contexts")
 }
 
-model Item {
-  id          Int       @id @default(autoincrement())
-  name        String
-  description String?
-  quantity    Int
-  characterId Int
-  character   Character @relation(fields: [characterId], references: [id])
-  createdAt   DateTime  @default(now())
+// model Item {
+//   id          Int       @id @default(autoincrement())
+//   name        String
+//   description String?
+//   quantity    Int
+//   characterId Int
+//   character   Character @relation(fields: [characterId], references: [id])
+//   createdAt   DateTime  @default(now())
 
-  @@map("items")
-}
+//   @@map("items")
+// }
 
 model Character {
   id          Int       @id @default(autoincrement())
@@ -73,7 +73,7 @@ model Character {
   userId      Int
   user        User      @relation(fields: [userId], references: [id])
   createdAt   DateTime  @default(now())
-  items       Item[]
+  // items       Item[]
   contexts    Context[]
 
   @@map("characters")

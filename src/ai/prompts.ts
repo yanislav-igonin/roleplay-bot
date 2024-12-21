@@ -115,7 +115,7 @@ export const gmPrompt = `Act as though we are playing a Game of Dungeons and Dra
   Before we begin playing, I would like you to provide my three adventure options. Each should be a short description of the kind of adventure we will play, and what the tone of the adventure will be. Once I decide on the adventure, you may provide a brief setting description and begin the game. I would also like an opportunity to provide the details of my character for your reference, specifically my class, race, AC, and HP.`;
 
 export const markdownRules =
-  `Text should be formatted in Markdown. ` +
+  `Text inside JSON fields should be formatted in Markdown. ` +
   `You can use ONLY the following formatting without any exceptions:` +
   `**bold text**, *italic text*, ~~strikethrough~~.`;
 
@@ -127,10 +127,10 @@ export const getNewGamePrompt = (language = Language.Ru) =>
   `Describe a world briefly, its inhabitants and where the heroes located.\n` +
   `Describe a quest that players will have to complete.\n` +
   `All description should not be longer than 1000 characters.\n` +
-  `${markdownRules}\n` +
+  // `${markdownRules}\n` +
   lineBreaksPrompt +
   `Format output as a JSON - ` +
-  `{"name": "Game name", "description": "Game description"}. It shouldnt be markdown json, but a json with the markdown in it.`;
+  `{"name": "Game name", "description": "Game description"}.`;
 
 export const getNewCharacterPrompt = (
   gameDescription: string,
@@ -140,7 +140,7 @@ export const getNewCharacterPrompt = (
   `""") in ${language} language.\n` +
   `Character description should not be longer than 300 characters.\n` +
   `Character descrpition ` +
-  `${markdownRules}` +
+  // `${markdownRules}` +
   `Describe a character's appearance, race (based on any provided in the game ` +
   `description, or invent your own, but it should fit in the game world),` +
   `personality, background, class, race, AC, and HP, etc.\n` +
@@ -172,7 +172,7 @@ export const getFirstContextPrompt = (
   characterDescription: string
 ) =>
   gmPrompt +
-  markdownRules +
+  // markdownRules +
   `Based on the game description and a character description provided below between """ ` +
   `make a description of where our characters located right now before the quest.\n` +
   `It can be a tavern, a forest, a cave, etc.\n` +

@@ -26,9 +26,10 @@ bot.use(userMiddleware);
 bot.use(allowedUserMiddleware);
 bot.use(menus.start);
 
-bot.command('start', async (context) => {
-  await context.reply(locale.ru.replies.start, { reply_markup: menus.start });
-});
+// bot.command('start', async (context) => {
+//   await context.reply(locale.ru.replies.start, { reply_markup: menus.start });
+// });
+bot.command('start', startNewGame);
 
 bot.command('help', async (context) => {
   await context.reply(locale.ru.replies.help);

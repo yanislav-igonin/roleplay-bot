@@ -27,7 +27,7 @@ enum Models {
   Dalle3 = 'dall-e-3',
   GPT4O = 'gpt-4-o',
   Gpt35Turbo = 'gpt-3.5-turbo',
-  GrokBeta = 'grok-beta',
+  Grok2 = 'grok-2-1212',
 }
 
 export const addSystemContext = (text: string) => {
@@ -55,7 +55,8 @@ export const getNewGame = async () => {
   const message = addUserContext(getNewGamePrompt());
   const response = await grok.chat.completions.create({
     messages: [message],
-    model: Models.GrokBeta,
+    model: Models.Grok2,
+    response_format: { type: 'json_object' },
     temperature: 0.7,
   });
 
@@ -80,7 +81,8 @@ export const getNewCharacter = async (gameDescription: string) => {
   const message = addUserContext(getNewCharacterPrompt(gameDescription));
   const response = await grok.chat.completions.create({
     messages: [message],
-    model: Models.GrokBeta,
+    model: Models.Grok2,
+    response_format: { type: 'json_object' },
     temperature: 0.7,
   });
 
@@ -139,8 +141,8 @@ export const getImage = async (text: string) => {
     model: 'dall-e-3',
     prompt: withStyling,
     response_format: 'url',
-    // size: '1792x1024',
-    size: '512x512',
+    size: '1792x1024',
+    // size: '512x512',
   });
   return response.data[0].url as string;
 };
@@ -154,7 +156,7 @@ export const getFirstContext = async (
   );
   const response = await grok.chat.completions.create({
     messages: [message],
-    model: Models.GrokBeta,
+    model: Models.Grok2,
     temperature: 0.8,
   });
 
