@@ -48,6 +48,13 @@
         "arrowParens": "avoid",
         "endOfLine": "auto"
       }
+    ],
+    "func-style": [
+      "error",
+      "declaration",
+      {
+        "allowArrowFunctions": true
+      }
     ]
   }
 }

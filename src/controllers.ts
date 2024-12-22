@@ -12,10 +12,10 @@ import {
   getSummaryForImageGeneration,
 } from 'ai';
 import {
-  characterGenerationPrompt,
+  // characterGenerationPrompt,
   getUsedLanguagePrompt,
   gmPrompt,
-  initialPrompt,
+  // initialPrompt,
   markdownRules,
   shortReplyPrompt,
 } from 'ai/prompts';
@@ -26,10 +26,11 @@ import { type Message, type Update } from 'grammy/types';
 import { locale } from 'locale';
 // import { replaceNewLines } from 'strings';
 
-const getMessageUniqueId = (message: Message) =>
-  `${message.chat.id.toString()}_${message.message_id.toString()}`;
+function getMessageUniqueId(message: Message) {
+  return `${message.chat.id.toString()}_${message.message_id.toString()}`;
+}
 
-export const startNewGame = async (context: BotContext) => {
+export async function startNewGame(context: BotContext) {
   const { user } = context.state;
 
   await context.reply(locale.ru.replies.startingNewGame);
@@ -92,9 +93,9 @@ export const startNewGame = async (context: BotContext) => {
       text: firstContext,
     },
   });
-};
+}
 
-export const reply = async (botContext: BotContext) => {
+export async function reply(botContext: BotContext) {
   const {
     message_id: messageId,
     reply_to_message: messageRepliedOn,
@@ -193,4 +194,4 @@ export const reply = async (botContext: BotContext) => {
       text: nextContext,
     },
   });
-};
+}

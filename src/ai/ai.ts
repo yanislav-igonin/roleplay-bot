@@ -30,28 +30,28 @@ enum Models {
   Grok2 = 'grok-2-1212',
 }
 
-export const addSystemContext = (text: string) => {
+export function addSystemContext(text: string) {
   return {
     content: text,
     role: 'system',
   } as ChatCompletionRequestMessage;
-};
+}
 
-export const addAssistantContext = (text: string) => {
+export function addAssistantContext(text: string) {
   return {
     content: text,
     role: 'assistant',
   } as ChatCompletionRequestMessage;
-};
+}
 
-export const addUserContext = (text: string) => {
+export function addUserContext(text: string) {
   return {
     content: text,
     role: 'user',
   } as ChatCompletionRequestMessage;
-};
+}
 
-export const getNewGame = async () => {
+export async function getNewGame() {
   const message = addUserContext(getNewGamePrompt());
   const response = await grok.chat.completions.create({
     messages: [message],
@@ -75,9 +75,9 @@ export const getNewGame = async () => {
   } catch {
     throw new JsonParseError('parsing new game data error', text);
   }
-};
+}
 
-export const getNewCharacter = async (gameDescription: string) => {
+export async function getNewCharacter(gameDescription: string) {
   const message = addUserContext(getNewCharacterPrompt(gameDescription));
   const response = await grok.chat.completions.create({
     messages: [message],
@@ -101,9 +101,9 @@ export const getNewCharacter = async (gameDescription: string) => {
   } catch {
     throw new JsonParseError('parsing new character data error', text);
   }
-};
+}
 
-export const getSummaryForImageGeneration = async (text: string) => {
+export async function getSummaryForImageGeneration(text: string) {
   const message = addUserContext(getSummaryForImageGenerationPrompt(text));
   const response = await openai.chat.completions.create({
     messages: [message],
@@ -116,13 +116,13 @@ export const getSummaryForImageGeneration = async (text: string) => {
   }
 
   return textResponse;
-};
+}
 
 /**
  * Generate an image based on text provided.
  * Useful to generate any kind of images for games views, characters portraits, etc.
  */
-export const getImage = async (text: string) => {
+export async function getImage(text: string) {
   const withStyling = `${text}\n\nStyle: Fantasy portrait or landscape\n\n`;
   const response = await openai.images.generate({
     model: 'dall-e-3',
@@ -132,12 +132,12 @@ export const getImage = async (text: string) => {
     size: '1792x1024',
   });
   return response.data[0].url as string;
-};
+}
 
-export const getFirstContext = async (
+export async function getFirstContext(
   gameDescription: string,
   characterDescription: string
-) => {
+) {
   const message = addUserContext(
     getFirstContextPrompt(gameDescription, characterDescription)
   );
@@ -153,9 +153,9 @@ export const getFirstContext = async (
   }
 
   return textResponse;
-};
+}
 
-export const getContextSummary = async (context: string) => {
+export async function getContextSummary(context: string) {
   const message = addUserContext(getContextSummaryPrompt(context));
   const response = await openai.chat.completions.create({
     messages: [message],
@@ -168,12 +168,12 @@ export const getContextSummary = async (context: string) => {
   }
 
   return textResponse;
-};
+}
 
-export const getNextContext = async (
+export async function getNextContext(
   messages = [] as ChatCompletionRequestMessage[],
   model = Models.Grok2
-) => {
+) {
   const response = await grok.chat.completions.create({
     messages,
     model,
@@ -185,4 +185,4 @@ export const getNextContext = async (
   }
 
   return textResponse;
-};
+}
