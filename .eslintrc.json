@@ -38,6 +38,23 @@
           "constructors": "no-public"
         }
       }
+    ],
+    "prettier/prettier": [
+      "error",
+      {
+        "singleQuote": true,
+        "trailingComma": "es5",
+        "printWidth": 85,
+        "arrowParens": "avoid",
+        "endOfLine": "auto"
+      }
+    ],
+    "func-style": [
+      "error",
+      "declaration",
+      {
+        "allowArrowFunctions": true
+      }
     ]
   }
 }
