@@ -18,9 +18,10 @@ type ChatCompletionRequestMessage =
 export const openai = new OpenAI({
   apiKey: config.openAiApiKey,
 });
-export const grok = new OpenAI({
-  apiKey: config.grokApiKey,
-  baseURL: 'https://api.x.ai/v1',
+export const ai = new OpenAI({
+  // apiKey: config.grokApiKey,
+  // baseURL: 'https://api.x.ai/v1',
+  apiKey: config.openAiApiKey,
 });
 
 enum Models {
@@ -53,9 +54,9 @@ export function addUserContext(text: string) {
 
 export async function getNewGame() {
   const message = addUserContext(getNewGamePrompt());
-  const response = await grok.chat.completions.create({
+  const response = await ai.chat.completions.create({
     messages: [message],
-    model: Models.Grok2,
+    model: Models.GPT4O,
     response_format: { type: 'json_object' },
     temperature: 0.7,
   });
@@ -79,9 +80,9 @@ export async function getNewGame() {
 
 export async function getNewCharacter(gameDescription: string) {
   const message = addUserContext(getNewCharacterPrompt(gameDescription));
-  const response = await grok.chat.completions.create({
+  const response = await ai.chat.completions.create({
     messages: [message],
-    model: Models.Grok2,
+    model: Models.GPT4O,
     response_format: { type: 'json_object' },
     temperature: 0.7,
   });
@@ -141,9 +142,9 @@ export async function getFirstContext(
   const message = addUserContext(
     getFirstContextPrompt(gameDescription, characterDescription)
   );
-  const response = await grok.chat.completions.create({
+  const response = await ai.chat.completions.create({
     messages: [message],
-    model: Models.Grok2,
+    model: Models.GPT4O,
     temperature: 0.8,
   });
 
@@ -172,9 +173,9 @@ export async function getContextSummary(context: string) {
 
 export async function getNextContext(
   messages = [] as ChatCompletionRequestMessage[],
-  model = Models.Grok2
+  model = Models.GPT4O
 ) {
-  const response = await grok.chat.completions.create({
+  const response = await ai.chat.completions.create({
     messages,
     model,
   });
