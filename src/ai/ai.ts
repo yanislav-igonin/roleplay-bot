@@ -26,7 +26,7 @@ export const ai = new OpenAI({
 
 enum Models {
   Dalle3 = 'dall-e-3',
-  GPT4O = 'gpt-4-o',
+  GPT4O = 'gpt-4o',
   Gpt35Turbo = 'gpt-3.5-turbo',
   Grok2 = 'grok-2-1212',
 }
