@@ -6,20 +6,14 @@ import { type BotContext } from 'context';
 import { type NextFunction } from 'grammy';
 // eslint-disable-next-line import/extensions
 
-export const stateMiddleware = async (
-  context: BotContext,
-  next: NextFunction,
-) => {
+export const stateMiddleware = async (context: BotContext, next: NextFunction) => {
   // @ts-expect-error Property user   is missing in type {} but required in type
   context.state = {};
   // eslint-disable-next-line node/callback-return
   await next();
 };
 
-export const errorMiddleware = async (
-  context: BotContext,
-  next: NextFunction,
-) => {
+export const errorMiddleware = async (context: BotContext, next: NextFunction) => {
   try {
     // eslint-disable-next-line node/callback-return
     await next();
@@ -29,10 +23,7 @@ export const errorMiddleware = async (
   }
 };
 
-export const userMiddleware = async (
-  context: BotContext,
-  next: NextFunction,
-) => {
+export const userMiddleware = async (context: BotContext, next: NextFunction) => {
   const { from: user } = context;
   if (!user) {
     // eslint-disable-next-line node/callback-return
@@ -78,7 +69,7 @@ export const userMiddleware = async (
 
 export const allowedUserMiddleware = async (
   context: BotContext,
-  next: NextFunction,
+  next: NextFunction
 ) => {
   const { isAllowed, username } = context.state.user;
   const isAdmin = config.adminsUsernames.includes(username ?? '');
@@ -86,7 +77,7 @@ export const allowedUserMiddleware = async (
   const hasAccess = isAllowed || isAdmin;
 
   if (!hasAccess) {
-    // await context.reply('Access denied');
+    await context.reply('Access denied');
     return;
   }
 
