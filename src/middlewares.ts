@@ -72,11 +72,12 @@ export const allowedUserMiddleware = async (
   next: NextFunction
 ) => {
   const { isAllowed, username } = context.state.user;
+  const { chat } = context;
   const isAdmin = config.adminsUsernames.includes(username ?? '');
 
   const hasAccess = isAllowed || isAdmin;
 
-  if (!hasAccess) {
+  if (!hasAccess && chat?.type === 'private') {
     await context.reply('Access denied');
     return;
   }
