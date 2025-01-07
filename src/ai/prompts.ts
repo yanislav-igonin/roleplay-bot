@@ -195,7 +195,7 @@ export const shortReplyPrompt = 'Output should be no longer than 500 characters.
 
 export function getContextSummaryPrompt(text: string) {
   return (
-    `Create a short summary (150 characters maximum) of the following text` +
+    `Create a short summary (70% of the original text length) of the following text` +
     `enclosed between """. Summary MUST be in the same language as text.\n` +
     `Text: """${text}"""`
   );
