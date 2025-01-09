@@ -185,5 +185,5 @@ export async function getNextContext(
     throw new Error(locale.ru.errors.noTextInResponse);
   }
 
-  return textResponse;
+  return JSON.parse(textResponse) as { actionsRequired: string[]; context: string };
 }

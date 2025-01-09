@@ -15,6 +15,7 @@ import {
   // characterGenerationPrompt,
   getUsedLanguagePrompt,
   gmPrompt,
+  jsonProtocolRules,
   // initialPrompt,
   markdownRules,
   shortReplyPrompt,
@@ -96,11 +97,8 @@ export async function startNewGame(context: BotContext) {
 }
 
 export async function reply(botContext: BotContext) {
-  const {
-    message_id: messageId,
-    reply_to_message: messageRepliedOn,
-    text: messageText,
-  } = botContext.message as Message & Update.NonChannel;
+  const { reply_to_message: messageRepliedOn, text: messageText } =
+    botContext.message as Message & Update.NonChannel;
   const botId = botContext.me.id;
 
   const notReply = messageRepliedOn === undefined;
@@ -161,6 +159,7 @@ export async function reply(botContext: BotContext) {
     addSystemContext(`Game description:\n\n${game.description}`)
   );
   preparedMessages.unshift(addSystemContext(markdownRules));
+  preparedMessages.unshift(addSystemContext(jsonProtocolRules));
   preparedMessages.unshift(addSystemContext(shortReplyPrompt));
   preparedMessages.unshift(addSystemContext(gmPrompt));
 
@@ -179,7 +178,14 @@ export async function reply(botContext: BotContext) {
   preparedMessages.push(userMessage);
   preparedMessages.push(addSystemContext(getUsedLanguagePrompt()));
 
-  const nextContext = await getNextContext(preparedMessages);
+  const { context: nextContext, actionsRequired } = await getNextContext(
+    preparedMessages
+  );
+
+  if (actionsRequired.length > 0) {
+    // do something with actionsRequired
+  }
+
   const nextContextSummary = await getContextSummary(nextContext);
 
   const newTelegramMessage = await botContext.reply(nextContext, {
